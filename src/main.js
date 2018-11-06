@@ -3,13 +3,18 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import { Button, Field, Actionsheet, Picker, Popup } from 'vant'
+import { Button, Field, Actionsheet, Picker, Popup, NavBar, Row, Col, Icon, Tabbar, TabbarItem, Uploader } from 'vant'
 
 Vue.use(Button)
 Vue.use(Field)
 Vue.use(Actionsheet)
 Vue.use(Picker)
 Vue.use(Popup)
+Vue.use(NavBar)
+Vue.use(Tabbar).use(TabbarItem)
+Vue.use(Row).use(Col)
+Vue.use(Icon)
+Vue.use(Uploader)
 
 Vue.config.productionTip = false
 

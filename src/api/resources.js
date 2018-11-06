@@ -7,7 +7,7 @@ Vue.use(VueResource)
 Vue.http.options.crossOrigin = true
 Vue.http.options.credentials = true
 
-const API_ROOT = process.env.NODE_ENV === 'production' ? 'https://api.jackhu.top/api/' : 'http://localhost:8080/api/'
+const API_ROOT = process.env.NODE_ENV === 'production' ? '/api/' : 'http://localhost:8080/api/'
 
 // Vue.http.interceptors.push((request, next) => {
 //   // 这里对请求体进行处理
@@ -25,3 +25,4 @@ const API_ROOT = process.env.NODE_ENV === 'production' ? 'https://api.jackhu.top
 // })
 
 export const AuthResource = Vue.resource(API_ROOT + 'CarOwner{/id}')
+export const FileResource = Vue.resource(API_ROOT + 'FileUpload{/id}')

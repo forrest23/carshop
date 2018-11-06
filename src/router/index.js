@@ -1,28 +1,57 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Home from '@/components/Home'
 import Login from '@/components/Login'
+import Photo from '@/components/Photo'
+
+import { Toast } from 'vant'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: __dirname,
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld,
+      name: 'Home',
+      component: Home,
       meta: {
-        title: '会员中心'
+        check: true
       }
     }, {
       path: '/login',
       name: 'Login',
       component: Login,
       meta: {
-        title: '登陆'
+        check: false
+      }
+    }, {
+      path: '/photo',
+      name: 'Photo',
+      component: Photo,
+      meta: {
+        check: true
       }
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.check) {
+    var check = async function () {
+      const result = await sessionStorage.getItem('username')
+      if (result) {
+        next()
+      } else {
+        Toast('用户未登录，请先登录！')
+        next({path: '/login'})
+      }
+    }
+    check()
+  } else {
+    next()
+  }
+})
+
+export default router
