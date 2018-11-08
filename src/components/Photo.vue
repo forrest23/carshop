@@ -1,6 +1,6 @@
 <template>
   <div>
-    <van-nav-bar title="拍照识别" :right-text="username" @click-left="onClickLeft" @click-right="onClickRight"/>
+    <van-nav-bar title="拍照识别" left-text="返回" left-arrow  right-text="提交" @click-left="onClickLeft" @click-right="onClickRight"/>
     <div>
        <van-row type="flex" class="buttons">
          <van-col span="4">
@@ -139,7 +139,9 @@ export default {
     this.username = sessionStorage.getItem('username') || '';
   },
   methods: {
-    onClickLeft() {},
+    onClickLeft() {
+      this.$router.go(-1);
+    },
     onClickRight() {
       Toast('按钮');
     },
@@ -178,18 +180,18 @@ export default {
           api.uploadFile(formData).then(
             response => {
               if (!response.ok || response.status !== 200) {
-                Toast('图像识别失败！');
+                Toast('图片识别失败，请检查图片是否正确并且清晰！');
               }
               console.log(response);
               that.setDataField(response, type);
             },
             response => {
-              Toast('图像上传失败！');
+              Toast('图片识别失败，请检查上传的图片是否正确！');
             }
           );
         },
         error(err) {
-          Toast('图像压缩失败！' + err.message);
+          Toast('图片压缩失败！');
         },
       });
     },
