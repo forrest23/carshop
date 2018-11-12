@@ -41,7 +41,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.check) {
     var check = async function () {
       const result = await sessionStorage.getItem('username')
-      if (result) {
+      if (result && result.length > 0) {
         next()
       } else {
         Toast('用户未登录，请先登录！')

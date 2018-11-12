@@ -1,9 +1,12 @@
 <template>
   <div>
-    <van-nav-bar title="标题" :right-text="username" @click-left="onClickLeft" @click-right="onClickRight"/>
+    <van-nav-bar title="锐龙4S店移动管理系统" :right-text="username" @click-left="onClickLeft" @click-right="onClickRight"/>
     <div class="tools">
        <van-row type="flex" justify="space-around">
-         <van-col span="6"><van-icon name="photograph" size="48px" color="#2894FF" @click="onRouterTo"/></van-col>
+         <van-col span="6">
+           <van-icon name="photograph" size="48px" color="#2894FF" @click="onRouterTo"/>
+           <span>拍照识别</span>
+          </van-col>
          <van-col span="6"></van-col>
          <van-col span="6"></van-col>
        </van-row>
@@ -34,7 +37,9 @@ export default {
     },
     onClickLeft() {},
     onClickRight() {
-      Toast('按钮');
+      sessionStorage.setItem('companyname', '');
+      sessionStorage.setItem('username', '');
+      this.$router.push('/login');
     },
   },
 };
@@ -49,8 +54,20 @@ h2 {
 .tools {
   padding-top: 10px;
 }
-img {
-  width: 70px;
-  height: 70px;
-}
+.van-col {
+    text-align: center;
+    height: 100px;
+    float: none;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .van-icon {
+    display: block;
+    font-size: 32px;
+    margin: 5px 0;
+    color: rgba(69, 90, 100, .8);
+  }
+  span {
+    font-size: 14px;
+  }
 </style>

@@ -23,6 +23,6 @@ const API_ROOT = process.env.NODE_ENV === 'production' ? '/api/' : 'http://local
 //     }
 //   })
 // })
-
-export const AuthResource = Vue.resource(API_ROOT + 'CarOwner{/id}')
+export const UserResource = Vue.resource(API_ROOT + 'User{/id}')
 export const FileResource = Vue.resource(API_ROOT + 'FileUpload{/id}')
+export const CarIdResource = Vue.resource(API_ROOT + 'CarId{/id}')

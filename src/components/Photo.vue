@@ -4,83 +4,83 @@
     <div>
        <van-row type="flex" class="buttons">
          <van-col span="4">
-           <van-uploader :after-read="onReadVehiclePlate" accept="image/jpg,image/jpeg,image/png">
+           <van-uploader :after-read="onReadVehiclePlate" accept="image/jpg">
              <van-icon name="photograph" />
               车牌号
            </van-uploader>
          </van-col>
           <van-col span="4">
-           <van-uploader :after-read="onReadVehicle" accept="image/jpg,image/jpeg,image/png">
+           <van-uploader :after-read="onReadVehicle" accept="image/jpg,image/jpeg">
              <van-icon name="photograph" />
               行驶证
            </van-uploader>
            </van-col>
          <van-col span="4">
-           <van-uploader :after-read="onReadIdcard" accept="image/jpg,image/jpeg,image/png">
+           <van-uploader :after-read="onReadIdcard" accept="image/jpg,image/jpeg">
              <van-icon name="photograph" />
               身份证
            </van-uploader>
          </van-col>
          <van-col span="4">
-           <van-uploader :after-read="onReadDriver" accept="image/jpg,image/jpeg,image/png">
+           <van-uploader :after-read="onReadDriver" accept="image/jpg,image/jpeg">
              <van-icon name="photograph" />
               驾驶证
            </van-uploader>
            </van-col>
-         <van-col span="4"><van-uploader :after-read="onReadGenerale" accept="image/jpg,image/jpeg,image/png">
+         <van-col span="4"><van-uploader :after-read="onReadGenerale" accept="image/jpg,image/jpeg">
              <van-icon name="photograph" />
               自由拍
            </van-uploader>
            </van-col>
          <van-col span="4">
-           <van-uploader :after-read="onReadPhoto" accept="iimage/jpg,image/jpeg,image/png">
+           <van-uploader :after-read="onReadPhoto" accept="iimage/jpg,image/jpeg">
              <van-icon name="photograph" />
               拍照
            </van-uploader></van-col>
        </van-row>
        <van-row type="flex">
-         <van-col span="8"><van-field label="车牌号" v-model="plate_num" /></van-col>
-         <van-col span="8"><van-field label="油表数" v-model="oil_meter" /></van-col>
-         <van-col span="8"><van-field label="公里数" v-model="mileage" /></van-col>
+         <van-col span="8"><van-field label="车牌号" v-model="carIdModel.plate_num" /></van-col>
+         <van-col span="8"><van-field label="油表数" v-model="carIdModel.oil_meter" /></van-col>
+         <van-col span="8"><van-field label="公里数" v-model="carIdModel.mileage" /></van-col>
        </van-row>
         <van-row type="flex">
-         <van-col span="16"><van-field label="车架号" v-model="vin" /></van-col>
-         <van-col span="10"><van-field label="发动机号" v-model="engine_num" /></van-col>
+         <van-col span="16"><van-field label="车架号" v-model="carIdModel.vin" /></van-col>
+         <van-col span="10"><van-field label="发动机号" v-model="carIdModel.engine_num" /></van-col>
        </van-row>
        <van-row type="flex">
-         <van-col span="16"><van-field label="厂牌型号" v-model="model" /></van-col>
-         <van-col span="10"><van-field label="初登日期" v-model="register_date" /></van-col>
+         <van-col span="16"><van-field label="厂牌型号" v-model="carIdModel.model" /></van-col>
+         <van-col span="10"><van-field label="初登日期" v-model="carIdModel.register_date" /></van-col>
        </van-row>
         <van-row type="flex">
-         <van-col span="24"><van-field label="车主" v-model="owner" /></van-col>
+         <van-col span="24"><van-field label="车主" v-model="carIdModel.owner" /></van-col>
        </van-row>
        <van-row type="flex">
-         <van-col span="24"><van-field label="车主地址" v-model="addr" /></van-col>
+         <van-col span="24"><van-field label="车主地址" v-model="carIdModel.addr" /></van-col>
        </van-row>
        <van-row type="flex">
-         <van-col span="8"><van-field label="身份证名" v-model="name" /></van-col>
-         <van-col span="8"><van-field label="性别" v-model="sex" /></van-col>
-         <van-col span="8"><van-field label="民族" v-model="nationality" /></van-col>
+         <van-col span="8"><van-field label="身份证名" v-model="carIdModel.name" /></van-col>
+         <van-col span="8"><van-field label="性别" v-model="carIdModel.sex" /></van-col>
+         <van-col span="8"><van-field label="民族" v-model="carIdModel.nationality" /></van-col>
        </van-row>
        <van-row type="flex">
-         <van-col span="24"><van-field label="身份证号" v-model="num" /></van-col>
+         <van-col span="24"><van-field label="身份证号" v-model="carIdModel.num" /></van-col>
        </van-row>
        <van-row type="flex">
-         <van-col span="24"><van-field label="身份证地址" v-model="address" /></van-col>
+         <van-col span="24"><van-field label="身份证地址" v-model="carIdModel.address" /></van-col>
        </van-row>
        <van-row type="flex">
-         <van-col span="8"><van-field label="驾照姓名" v-model="driver_name" /></van-col>
-         <van-col span="8"><van-field label="性别" v-model="driver_sex" /></van-col>
-         <van-col span="8"><van-field label="准驾车型" v-model="vehicle_type" /></van-col>
+         <van-col span="8"><van-field label="驾照姓名" v-model="carIdModel.driver_name" /></van-col>
+         <van-col span="8"><van-field label="性别" v-model="carIdModel.driver_sex" /></van-col>
+         <van-col span="8"><van-field label="准驾车型" v-model="carIdModel.vehicle_type" /></van-col>
        </van-row>
        <van-row type="flex">
-         <van-col span="24"><van-field label="驾照地址" v-model="driver_addr" /></van-col>
+         <van-col span="24"><van-field label="驾照地址" v-model="carIdModel.driver_addr" /></van-col>
        </van-row>
        <van-row type="flex">
-         <van-col span="24"><van-field label="驾照到期" v-model="driver_end_date" /></van-col>
+         <van-col span="24"><van-field label="驾照到期" v-model="carIdModel.driver_end_date" /></van-col>
        </van-row>
        <van-row type="flex">
-         <van-col span="24"><van-field label="自由拍信息" type="textarea" v-model="generale" rows="1" autosize/></van-col>
+         <van-col span="24"><van-field label="自由拍信息" type="textarea" v-model="carIdModel.generale" rows="1" autosize/></van-col>
        </van-row>
         <van-row type="flex">
          <van-col span="8"><img :src="plate_image" width="100px"/></van-col>
@@ -104,46 +104,73 @@ export default {
   name: 'Photo',
   data() {
     return {
-      username: '',
-      active: 0,
-      value: '',
       plate_image: '',
       vehicle_image: '',
       idcard_image: '',
       driver_image: '',
       generale_image: '',
       photo_image: '',
-      plate_num: '',
-      oil_meter: '',
-      mileage: '',
-      vin: '',
-      engine_num: '',
-      model: '',
-      register_date: '',
-      owner: '',
-      addr: '',
-      name: '',
-      sex: '',
-      nationality: '',
-      num: '',
-      address: '',
-      driver_name: '',
-      driver_sex: '',
-      vehicle_type: '',
-      driver_addr: '',
-      driver_end_date: '',
-      generale: '',
+      carIdModel: {
+        fname: '',
+        fcmpno: '',
+        fcmpname: '',
+        plate_num: '',
+        oil_meter: '',
+        mileage: '',
+        vin: '',
+        engine_num: '',
+        model: '',
+        register_date: '',
+        owner: '',
+        addr: '',
+        name: '',
+        sex: '',
+        nationality: '',
+        num: '',
+        address: '',
+        driver_name: '',
+        driver_sex: '',
+        vehicle_type: '',
+        driver_addr: '',
+        driver_end_date: '',
+        generale: '',
+        fno: '',
+      },
     };
   },
-  created: function() {
-    this.username = sessionStorage.getItem('username') || '';
+  mounted: function() {
+    this.carIdModel.fname = sessionStorage.getItem('username') || '';
+    this.carIdModel.fcmpno = sessionStorage.getItem('companyno') || '';
+    this.carIdModel.fcmpname = localStorage.getItem('companyname') || '';
+    this.carIdModel.fno = new Date().getTime();
+    console.log(this.carIdModel.fno);
   },
   methods: {
     onClickLeft() {
       this.$router.go(-1);
     },
     onClickRight() {
-      Toast('按钮');
+      Toast.loading({
+        mask: true,
+        message: '提交数据中...',
+      });
+      api.submit(this.carIdModel).then(
+        response => {
+          if (!response.ok) {
+            Toast('提交失败!请检查网络！');
+          }
+          console.log(response);
+          if (response.data.success) {
+            this.clearData();
+            Toast('数据提交成功！');
+          } else {
+            Toast('提交失败!请检查数据！');
+          }
+        },
+        response => {
+          Toast('提交失败!');
+        }
+      );
     },
     onReadVehiclePlate(file) {
       this.plate_image = file.content;
@@ -176,7 +203,11 @@ export default {
         quality: 0.6,
         success(result) {
           const formData = new FormData();
-          formData.append(type, result, file.name);
+          formData.append(
+            type + '|' + that.carIdModel.fno,
+            result,
+            imageFile.filename
+          );
           api.uploadFile(formData).then(
             response => {
               if (!response.ok || response.status !== 200) {
@@ -212,42 +243,69 @@ export default {
       var result = JSON.parse(response.bodyText);
       switch (type) {
         case 'vehiclePlate|face':
-          this.plate_num = result.plates[0].txt;
+          this.carIdModel.plate_num = result.plates[0].txt;
           break;
         case 'vehicle|face':
-          this.vin = result.vin;
-          this.engine_num = result.engine_num;
-          this.model = result.model;
-          this.register_date = result.register_date;
-          this.owner = result.owner;
-          this.addr = result.addr;
+          this.carIdModel.vin = result.vin;
+          this.carIdModel.engine_num = result.engine_num;
+          this.carIdModel.model = result.model;
+          this.carIdModel.register_date = result.register_date;
+          this.carIdModel.owner = result.owner;
+          this.carIdModel.addr = result.addr;
           break;
         case 'idcard|face':
-          this.name = result.name;
-          this.nationality = result.nationality;
-          this.sex = result.sex;
-          this.num = result.num;
-          this.address = result.address;
+          this.carIdModel.name = result.name;
+          this.carIdModel.nationality = result.nationality;
+          this.carIdModel.sex = result.sex;
+          this.carIdModel.num = result.num;
+          this.carIdModel.address = result.address;
           break;
         case 'driver|face':
-          this.driver_name = result.name;
-          this.driver_sex = result.sex;
-          this.vehicle_type = result.vehicle_type;
-          this.driver_addr = result.addr;
-          this.driver_end_date = result.end_date;
+          this.carIdModel.driver_name = result.name;
+          this.carIdModel.driver_sex = result.sex;
+          this.carIdModel.vehicle_type = result.vehicle_type;
+          this.carIdModel.driver_addr = result.addr;
+          this.carIdModel.driver_end_date = result.end_date;
           break;
         case 'generale|face':
           var text = '';
           if (result.ret) {
             for (var i = 0; i < result.ret.length; i++) {
-              text += result.ret[i].word  + ' \n ';
+              text += result.ret[i].word + ' \n ';
             }
           }
-          this.generale = text;
+          this.carIdModel.generale = text;
           break;
         default:
           break;
       }
+    },
+    clearData() {
+      this.carIdModel.fno = new Date().getTime();
+      this.carIdModel.plate_num = '';
+      this.carIdModel.vin = '';
+      this.carIdModel.engine_num = '';
+      this.carIdModel.model = '';
+      this.carIdModel.register_date = '';
+      this.carIdModel.owner = '';
+      this.carIdModel.addr = '';
+      this.carIdModel.name = '';
+      this.carIdModel.nationality = '';
+      this.carIdModel.sex = '';
+      this.carIdModel.num = '';
+      this.carIdModel.address = '';
+      this.carIdModel.driver_name = '';
+      this.carIdModel.driver_sex = '';
+      this.carIdModel.vehicle_type = '';
+      this.carIdModel.driver_addr = '';
+      this.carIdModel.driver_end_date = '';
+      this.carIdModel.generale = '';
+      this.plate_image = '';
+      this.vehicle_image = '';
+      this.idcard_image = '';
+      this.driver_image = '';
+      this.generale_image = '';
+      this.photo_image = '';
     },
   },
 };
@@ -279,3 +337,4 @@ h2 {
   padding: 5px;
 }
 </style>
+∂
