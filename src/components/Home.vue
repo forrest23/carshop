@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { Toast } from 'vant';
+import { Toast, Dialog } from 'vant';
 export default {
   name: 'Home',
   data() {
@@ -33,13 +33,21 @@ export default {
   },
   methods: {
     onRouterTo() {
-       this.$router.push('/Photo');
+      this.$router.push('/Photo');
     },
     onClickLeft() {},
     onClickRight() {
-      sessionStorage.setItem('companyname', '');
-      sessionStorage.setItem('username', '');
-      this.$router.push('/login');
+      Dialog.confirm({
+        title: '系统提示',
+        message: '是否确定退出系统？',
+      })
+        .then(() => {
+          sessionStorage.setItem('companyno', '');
+          sessionStorage.setItem('companyname', '');
+          sessionStorage.setItem('username', '');
+          this.$router.push('/login');
+        })
+        .catch(() => {});
     },
   },
 };
@@ -55,19 +63,19 @@ h2 {
   padding-top: 10px;
 }
 .van-col {
-    text-align: center;
-    height: 100px;
-    float: none;
-    display: inline-block;
-    vertical-align: middle;
-  }
-  .van-icon {
-    display: block;
-    font-size: 32px;
-    margin: 5px 0;
-    color: rgba(69, 90, 100, .8);
-  }
-  span {
-    font-size: 14px;
-  }
+  text-align: center;
+  height: 100px;
+  float: none;
+  display: inline-block;
+  vertical-align: middle;
+}
+.van-icon {
+  display: block;
+  font-size: 32px;
+  margin: 5px 0;
+  color: rgba(69, 90, 100, 0.8);
+}
+span {
+  font-size: 14px;
+}
 </style>

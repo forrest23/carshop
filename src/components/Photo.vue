@@ -1,38 +1,38 @@
 <template>
   <div>
-    <van-nav-bar title="拍照识别" left-text="返回" left-arrow  right-text="提交" @click-left="onClickLeft" @click-right="onClickRight"/>
+    <van-nav-bar title="拍照识别" :left-text="carIdModel.fname"  right-text="提交" @click-left="onClickLeft" @click-right="onClickRight"/>
     <div>
-       <van-row type="flex" class="buttons">
-         <van-col span="4">
+       <van-row type="flex" class="button-row">
+         <van-col span="4" class="button-col">
            <van-uploader :after-read="onReadVehiclePlate" accept="image/jpg">
              <van-icon name="photograph" />
               车牌号
            </van-uploader>
          </van-col>
-          <van-col span="4">
+          <van-col span="4" class="button-col">
            <van-uploader :after-read="onReadVehicle" accept="image/jpg,image/jpeg">
              <van-icon name="photograph" />
               行驶证
            </van-uploader>
            </van-col>
-         <van-col span="4">
+         <van-col span="4" class="button-col">
            <van-uploader :after-read="onReadIdcard" accept="image/jpg,image/jpeg">
              <van-icon name="photograph" />
               身份证
            </van-uploader>
          </van-col>
-         <van-col span="4">
+         <van-col span="4" class="button-col">
            <van-uploader :after-read="onReadDriver" accept="image/jpg,image/jpeg">
              <van-icon name="photograph" />
               驾驶证
            </van-uploader>
            </van-col>
-         <van-col span="4"><van-uploader :after-read="onReadGenerale" accept="image/jpg,image/jpeg">
+         <van-col span="4" class="button-col"><van-uploader :after-read="onReadGenerale" accept="image/jpg,image/jpeg">
              <van-icon name="photograph" />
               自由拍
            </van-uploader>
            </van-col>
-         <van-col span="4">
+         <van-col span="4" class="button-col">
            <van-uploader :after-read="onReadPhoto" accept="iimage/jpg,image/jpeg">
              <van-icon name="photograph" />
               拍照
@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import { Toast } from 'vant';
+import { Toast, Dialog } from 'vant';
 import Compressor from 'compressorjs';
 import api from '../api';
 export default {
@@ -147,30 +147,51 @@ export default {
   },
   methods: {
     onClickLeft() {
-      this.$router.go(-1);
+       Dialog.confirm({
+        title: '系统提示',
+        message: '是否确定退出系统？',
+      })
+        .then(() => {
+          sessionStorage.setItem('companyno', '');
+          sessionStorage.setItem('companyname', '');
+          sessionStorage.setItem('username', '');
+          this.$router.push('/login');
+        })
+        .catch(() => {});
     },
     onClickRight() {
-      Toast.loading({
-        mask: true,
-        message: '提交数据中...',
-      });
-      api.submit(this.carIdModel).then(
-        response => {
-          if (!response.ok) {
-            Toast('提交失败!请检查网络！');
-          }
-          console.log(response);
-          if (response.data.success) {
-            this.clearData();
-            Toast('数据提交成功！');
-          } else {
-            Toast('提交失败!请检查数据！');
-          }
-        },
-        response => {
-          Toast('提交失败!');
-        }
-      );
+      if (this.isEmpty()) {
+        Toast('请至少填写一项内容！');
+        return;
+      }
+      Dialog.confirm({
+        title: '系统提示',
+        message: '确定要提交数据吗？',
+      })
+        .then(() => {
+          Toast.loading({
+            mask: true,
+            message: '提交数据中...',
+          });
+          api.submit(this.carIdModel).then(
+            response => {
+              if (!response.ok) {
+                Toast('提交失败!请检查网络！');
+              }
+              console.log(response);
+              if (response.data.success) {
+                this.clearData();
+                Toast('数据提交成功！');
+              } else {
+                Toast('提交失败!请检查数据！');
+              }
+            },
+            response => {
+              Toast('提交失败!');
+            }
+          );
+        })
+        .catch(() => {});
     },
     onReadVehiclePlate(file) {
       this.plate_image = file.content;
@@ -204,7 +225,7 @@ export default {
         success(result) {
           const formData = new FormData();
           formData.append(
-            type + '|' + that.carIdModel.fno,
+            type + '|' + that.carIdModel.fno + '|' + that.carIdModel.fcmpno,
             result,
             imageFile.filename
           );
@@ -283,7 +304,9 @@ export default {
     clearData() {
       this.carIdModel.fno = new Date().getTime();
       this.carIdModel.plate_num = '';
-      this.carIdModel.vin = '';
+      (this.carIdModel.oil_meter = ''),
+        (this.carIdModel.mileage = ''),
+        (this.carIdModel.vin = '');
       this.carIdModel.engine_num = '';
       this.carIdModel.model = '';
       this.carIdModel.register_date = '';
@@ -307,6 +330,34 @@ export default {
       this.generale_image = '';
       this.photo_image = '';
     },
+    isEmpty() {
+      if (
+        this.carIdModel.plate_num == '' &&
+        this.carIdModel.plate_num == '' &&
+        this.carIdModel.oil_meter == '' &&
+        this.carIdModel.mileage == '' &&
+        this.carIdModel.vin == '' &&
+        this.carIdModel.engine_num == '' &&
+        this.carIdModel.model == '' &&
+        this.carIdModel.register_date == '' &&
+        this.carIdModel.owner == '' &&
+        this.carIdModel.addr == '' &&
+        this.carIdModel.name == '' &&
+        this.carIdModel.nationality == '' &&
+        this.carIdModel.sex == '' &&
+        this.carIdModel.num == '' &&
+        this.carIdModel.address == '' &&
+        this.carIdModel.driver_name == '' &&
+        this.carIdModel.driver_sex == '' &&
+        this.carIdModel.vehicle_type == '' &&
+        this.carIdModel.driver_addr == '' &&
+        this.carIdModel.driver_end_date == '' &&
+        this.carIdModel.generale == ''
+      ) {
+        return true;
+      } 
+      return false;
+    },
   },
 };
 </script>
@@ -317,11 +368,18 @@ h1,
 h2 {
   font-weight: normal;
 }
-.buttons {
+.button-row {
   text-align: center;
 }
+.button-col {
+  line-height: 40px !important;
+  border-right: 1px solid #c0c0c0;
+}
+.van-row {
+  border-bottom: 1px solid #c0c0c0;
+}
 .van-col {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 30px;
 }
 /* .van-col:nth-child(odd) {
