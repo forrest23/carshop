@@ -4,7 +4,7 @@
     <div>
        <van-row type="flex" class="button-row">
          <van-col span="4" class="button-col">
-           <van-uploader :after-read="onReadVehiclePlate" accept="image/jpg">
+           <van-uploader  :after-read="onReadVehiclePlate" accept="image/jpg">
              <van-icon name="photograph" />
               车牌号
            </van-uploader>
@@ -33,7 +33,7 @@
            </van-uploader>
            </van-col>
          <van-col span="4" class="button-col">
-           <van-uploader :after-read="onReadPhoto" accept="iimage/jpg,image/jpeg">
+           <van-uploader  :after-read="onReadPhoto" accept="iimage/jpg,image/jpeg">
              <van-icon name="photograph" />
               拍照
            </van-uploader></van-col>
@@ -82,16 +82,9 @@
        <van-row type="flex">
          <van-col span="24"><van-field label="自由拍信息" type="textarea" v-model="carIdModel.generale" rows="1" autosize/></van-col>
        </van-row>
-        <van-row type="flex">
-         <van-col span="8"><img :src="plate_image" width="100px"/></van-col>
-         <van-col span="8"><img :src="vehicle_image" width="100px"/></van-col>
-         <van-col span="8"><img :src="idcard_image" width="100px"/></van-col>
-       </van-row>
-       <van-row type="flex">
-         <van-col span="8"><img :src="driver_image" width="100px"/></van-col>
-         <van-col span="8"><img :src="generale_image" width="100px"/></van-col>
-         <van-col span="8"><img :src="photo_image" width="100px"/></van-col>
-       </van-row>
+       <div class="box">
+        <img v-for="image in carIdModel.images" :key="image.id" :src="image.content" class="inner"/>
+       </div>
     </div>
   </div>
 </template>
@@ -104,12 +97,7 @@ export default {
   name: 'Photo',
   data() {
     return {
-      plate_image: '',
-      vehicle_image: '',
-      idcard_image: '',
-      driver_image: '',
-      generale_image: '',
-      photo_image: '',
+      imageId:0,
       carIdModel: {
         fname: '',
         fcmpno: '',
@@ -135,6 +123,7 @@ export default {
         driver_end_date: '',
         generale: '',
         fno: '',
+        images: [],
       },
     };
   },
@@ -196,30 +185,28 @@ export default {
       );
     },
     onReadVehiclePlate(file) {
-      this.plate_image = file.content;
       this.uploadFile(file, 'vehiclePlate|face');
     },
     onReadVehicle(file) {
-      this.vehicle_image = file.content;
       this.uploadFile(file, 'vehicle|face');
     },
     onReadIdcard(file) {
-      this.idcard_image = file.content;
       this.uploadFile(file, 'idcard|face');
     },
     onReadDriver(file) {
-      this.driver_image = file.content;
       this.uploadFile(file, 'driver|face');
     },
     onReadGenerale(file) {
-      this.generale_image = file.content;
       this.uploadFile(file, 'generale|face');
     },
     onReadPhoto(file) {
-      this.photo_image = file.content;
       this.uploadFile(file, 'photo|face');
     },
     uploadFile(file, type) {
+       this.carIdModel.images.push({
+        id: this.imageId++,
+        content: file.content
+      })
       var imageFile = this.dataURLtoFile(file.content, file.name);
       var that = this;
       new Compressor(imageFile, {
@@ -334,12 +321,7 @@ export default {
       this.carIdModel.driver_addr = '';
       this.carIdModel.driver_end_date = '';
       this.carIdModel.generale = '';
-      this.plate_image = '';
-      this.vehicle_image = '';
-      this.idcard_image = '';
-      this.driver_image = '';
-      this.generale_image = '';
-      this.photo_image = '';
+      this.carIdModel.images=[];
     },
     isEmpty() {
       if (
@@ -404,6 +386,16 @@ h2 {
 }
 .van-cell {
   padding: 5px;
+}
+.box{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+}
+.inner{
+        width: 100px;
+        height: 100px;
+        margin: 10px;
 }
 </style>
 ∂
