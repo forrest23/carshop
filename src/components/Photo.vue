@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     onClickLeft() {
-       Dialog.confirm({
+      Dialog.confirm({
         title: '系统提示',
         message: '是否确定退出系统？',
       })
@@ -164,34 +164,36 @@ export default {
         Toast('请至少填写一项内容！');
         return;
       }
-      Dialog.confirm({
-        title: '系统提示',
-        message: '确定要提交数据吗？',
-      })
-        .then(() => {
-          Toast.loading({
-            mask: true,
-            message: '提交数据中...',
-          });
-          api.submit(this.carIdModel).then(
-            response => {
-              if (!response.ok) {
-                Toast('提交失败!请检查网络！');
-              }
-              console.log(response);
-              if (response.data.success) {
-                this.clearData();
-                Toast('数据提交成功！');
-              } else {
-                Toast('提交失败!请检查数据！');
-              }
-            },
-            response => {
-              Toast('提交失败!');
-            }
-          );
-        })
-        .catch(() => {});
+      Toast.loading({
+        mask: true,
+        message: '提交数据中...',
+      });
+      api.submit(this.carIdModel).then(
+        response => {
+          if (!response.ok) {
+            Dialog.alert({
+              title: '系统提示',
+              message: '提交失败!请检查网络！',
+            }).then(() => {});
+          }
+          console.log(response);
+          if (response.data.success) {
+            this.clearData();
+            Toast('数据提交成功！');
+          } else {
+            Dialog.alert({
+              title: '系统提示',
+              message: '提交失败!请检查数据！',
+            }).then(() => {});
+          }
+        },
+        response => {
+          Dialog.alert({
+            title: '系统提示',
+            message: '提交失败!请检查网络！',
+          }).then(() => {});
+        }
+      );
     },
     onReadVehiclePlate(file) {
       this.plate_image = file.content;
@@ -232,18 +234,27 @@ export default {
           api.uploadFile(formData).then(
             response => {
               if (!response.ok || response.status !== 200) {
-                Toast('图片识别失败，请检查图片是否正确并且清晰！');
+                Dialog.alert({
+                  title: '系统提示',
+                  message: '图片识别失败，请检查图片是否正确并且清晰！',
+                }).then(() => {});
               }
               console.log(response);
               that.setDataField(response, type);
             },
             response => {
-              Toast('图片识别失败，请检查上传的图片是否正确！');
+              Dialog.alert({
+                title: '系统提示',
+                message: '图片识别失败，请检查上传的图片是否正确！',
+              }).then(() => {});
             }
           );
         },
         error(err) {
-          Toast('图片压缩失败！');
+          Dialog.alert({
+            title: '系统提示',
+            message: '图片压缩失败！',
+          }).then(() => {});
         },
       });
     },
@@ -355,7 +366,7 @@ export default {
         this.carIdModel.generale == ''
       ) {
         return true;
-      } 
+      }
       return false;
     },
   },
