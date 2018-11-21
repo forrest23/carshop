@@ -26,3 +26,4 @@ const API_ROOT = process.env.NODE_ENV === 'production' ? '/api/' : 'http://local
 export const UserResource = Vue.resource(API_ROOT + 'User{/id}')
 export const FileResource = Vue.resource(API_ROOT + 'FileUpload{/id}')
 export const CarIdResource = Vue.resource(API_ROOT + 'CarId{/id}')
+export const MemberResource = Vue.resource(API_ROOT + 'Member{/id}')

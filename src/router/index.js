@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Photo from '@/components/Photo'
+import Register from '@/components/Register'
 
 import { Toast } from 'vant'
 
@@ -32,6 +33,13 @@ const router = new Router({
       component: Photo,
       meta: {
         check: true
+      }
+    }, {
+      path: '/register',
+      name: 'Register',
+      component: Register,
+      meta: {
+        check: false
       }
     }
   ]

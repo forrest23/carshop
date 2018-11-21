@@ -1,4 +1,4 @@
-import { FileResource, UserResource, CarIdResource } from './resources'
+import { FileResource, UserResource, CarIdResource, MemberResource } from './resources'
 
 export default {
   getCompanyInfo: function () {
@@ -12,5 +12,8 @@ export default {
   },
   submit: function (data) {
     return CarIdResource.save({id: 'Submit'}, data)
+  },
+  updateMember: function (data) {
+    return MemberResource.save({id: 'Submit'}, data)
   }
 }
