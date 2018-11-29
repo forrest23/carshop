@@ -13,7 +13,7 @@ export default {
   submit: function (data) {
     return CarIdResource.save({id: 'Submit'}, data)
   },
-  updateMember: function (data) {
-    return MemberResource.save({id: 'Submit'}, data)
+  updateOpenId: function (data) {
+    return MemberResource.save({id: 'UpdateOpenId'}, data)
   }
 }
