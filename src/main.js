@@ -5,7 +5,7 @@ import App from './App'
 import router from './router'
 import VueCookies from 'vue-cookies'
 import { Button, Field, Actionsheet, Picker, Popup, NavBar, Row, Col,
-  Icon, Tabbar, TabbarItem, Uploader, Cell, CellGroup, Panel } from 'vant'
+  Icon, Tabbar, TabbarItem, Uploader, Cell, CellGroup, Panel, Tab, Tabs } from 'vant'
 
 Vue.use(Button)
 Vue.use(Field)
@@ -18,7 +18,8 @@ Vue.use(Row).use(Col)
 Vue.use(Icon)
 Vue.use(Uploader)
 Vue.use(Cell).use(CellGroup)
-Vue.use(Panel);
+Vue.use(Panel)
+Vue.use(Tab).use(Tabs)
 
 Vue.use(VueCookies)
 

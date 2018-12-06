@@ -83,7 +83,7 @@
          <van-col span="24"><van-field label="自由拍信息" type="textarea" v-model="carIdModel.generale" rows="1" autosize/></van-col>
        </van-row>
        <div class="box">
-        <img v-for="image in carIdModel.images" :key="image.id" :src="image.content" class="inner"/>
+        <img v-for="image in images" :key="image.id" :src="image.content" class="inner"/>
        </div>
     </div>
   </div>
@@ -98,6 +98,7 @@ export default {
   data() {
     return {
       imageId:0,
+      images: [],
       carIdModel: {
         fname: '',
         fcmpno: '',
@@ -122,8 +123,7 @@ export default {
         driver_addr: '',
         driver_end_date: '',
         generale: '',
-        fno: '',
-        images: [],
+        fno: ''
       },
     };
   },
@@ -149,10 +149,6 @@ export default {
         .catch(() => {});
     },
     onClickRight() {
-      if (this.isEmpty()) {
-        Toast('请至少填写一项内容！');
-        return;
-      }
       Toast.loading({
         mask: true,
         message: '提交数据中...',
@@ -165,10 +161,9 @@ export default {
               message: '提交失败!请检查网络！',
             }).then(() => {});
           }
-          console.log(response);
           if (response.data.success) {
             this.clearData();
-            Toast('数据提交成功！');
+            Toast.success('数据提交成功');
           } else {
             Dialog.alert({
               title: '系统提示',
@@ -203,7 +198,11 @@ export default {
       this.uploadFile(file, 'photo|face');
     },
     uploadFile(file, type) {
-       this.carIdModel.images.push({
+      Toast.loading({
+        mask: true,
+        message: '图片上传中...',
+      });
+       this.images.push({
         id: this.imageId++,
         content: file.content
       })
@@ -226,8 +225,8 @@ export default {
                   message: '图片识别失败，请检查图片是否正确并且清晰！',
                 }).then(() => {});
               }
-              console.log(response);
               that.setDataField(response, type);
+              Toast.clear();
             },
             response => {
               Dialog.alert({
@@ -321,7 +320,7 @@ export default {
       this.carIdModel.driver_addr = '';
       this.carIdModel.driver_end_date = '';
       this.carIdModel.generale = '';
-      this.carIdModel.images=[];
+      this.images =[];
     },
     isEmpty() {
       if (

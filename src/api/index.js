@@ -1,4 +1,4 @@
-import { FileResource, UserResource, CarIdResource, MemberResource } from './resources'
+import { FileResource, UserResource, CarIdResource, MemberResource, MemberBalanceResource } from './resources'
 
 export default {
   getCompanyInfo: function () {
@@ -15,5 +15,11 @@ export default {
   },
   updateOpenId: function (data) {
     return MemberResource.save({id: 'UpdateOpenId'}, data)
+  },
+  getMember: function (params) {
+    return MemberResource.get(params)
+  },
+  getMemberBalance: function (params) {
+    return MemberBalanceResource.get(params)
   }
 }

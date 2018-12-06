@@ -4,6 +4,7 @@ import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Photo from '@/components/Photo'
 import Register from '@/components/Register'
+import Member from '@/components/Member'
 
 import { Toast } from 'vant'
 
@@ -38,6 +39,13 @@ const router = new Router({
       path: '/register',
       name: 'Register',
       component: Register,
+      meta: {
+        check: false
+      }
+    }, {
+      path: '/member',
+      name: 'Member',
+      component: Member,
       meta: {
         check: false
       }
