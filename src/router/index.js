@@ -5,6 +5,7 @@ import Login from '@/components/Login'
 import Photo from '@/components/Photo'
 import Register from '@/components/Register'
 import Member from '@/components/Member'
+import MemberItem from '@/components/MemberItem'
 
 import { Toast } from 'vant'
 
@@ -46,6 +47,14 @@ const router = new Router({
       path: '/member',
       name: 'Member',
       component: Member,
+      meta: {
+        check: false
+      }
+    },
+    {
+      path: '/memberItem',
+      name: 'MemberItem',
+      component: MemberItem,
       meta: {
         check: false
       }

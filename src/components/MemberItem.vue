@@ -1,15 +1,15 @@
 <template>
   <div class="container">
-    <van-nav-bar class="title" title="我的会员" />
+    <van-nav-bar class="title" title="会员项目历史" left-text="返回" left-arrow  @click-left="onClickLeft"/>
     <van-panel :title="member.name" :desc="member.classname" :status="member.cardno">
       <van-cell-group>
        <van-cell title="牌照号" :value="member.licensenum" />
        <van-cell title="手机号" :value="member.mobile"/>
       </van-cell-group>
     </van-panel>
-     <van-panel title="卡内余额" >
+     <van-panel :title="itemname" >
       <van-cell-group>
-        <van-cell v-for="balance in balances" :key="balance.itemno" :title="balance.itemname" :value="balance.balance" @click="showDetail(balance.itemno,balance.itemname)" is-link />
+        <van-cell v-for="history in historys" :key="history.serialno" :title="history.itemname" :value="history.qty" :label="history.regdate" />
       </van-cell-group>
     </van-panel>
   </div>
@@ -22,36 +22,39 @@ export default {
   name: 'Member',
   data() {
     return {
-      active: 0,
       openid: '',
-      cmpno: this.$route.query.cmpno,
-      member: {},
-      balances: [],
-      addHistorys: [],
-      reduceHistorys: [],
+      cmpno: this.$route.params.cmpno,
+      member: this.$route.params.member,
+      cardno: this.$route.params.cardno,
+      itemno: this.$route.params.itemno,
+      itemname: "【" + this.$route.params.itemname + "】历史",
+      historys: [],
     };
   },
   mounted: function() {
-    this.openid = this.$cookies.get('openid');
-    this.getMember();
+    this.openid = 'oYXbkskh5y8g6IyImR82i-maAQMs';
+    this.getHistory();
   },
   methods: {
-    getMember() {
+    onClickLeft() {
+         this.$router.back(-1);
+    },
+
+    getHistory() {
       const params = {
-        id: 'GetMember',
+        id: 'GetMemberBalanceInOutHis',
         cmpno: this.cmpno,
-        openid: this.openid,
+        cardno: this.cardno,
+        itemno: this.itemno
       };
-      api.getMember(params).then(
+      api.getMemberBalance(params).then(
         response => {
           if (!response.ok) {
             Toast('车主信息绑定失败!请检查网络！');
           }
           if (response.data.success) {
             Toast.clear();
-            this.member = response.data.data;
-            this.cardno = response.data.data.cardno;
-            this.getBalance();
+            this.historys = response.data.data;
           } else {
             Toast(response.data.message);
           }
@@ -61,12 +64,13 @@ export default {
         }
       );
     },
-
-    getBalance() {
+   
+    getBalanceDetail() {
       const params = {
-        id: 'GetMemberBalance',
+        id: 'GetMemberBalanceDetail',
         cmpno: this.cmpno,
         cardno: this.cardno,
+        itemno: this.itemno
       };
       api.getMemberBalance(params).then(
         response => {
@@ -84,48 +88,6 @@ export default {
           Toast('车主信息绑定失败!请检查网络');
         }
       );
-    },
-
-    getHistory() {
-      const params = {
-        id: 'GetMemberBalanceInOutHis',
-        cmpno: this.cmpno,
-        cardno: this.cardno,
-      };
-      api.getMemberBalance(params).then(
-        response => {
-          if (!response.ok) {
-            Toast('车主信息绑定失败!请检查网络！');
-          }
-          if (response.data.success) {
-            Toast.clear();
-            this.addHistorys = response.data.data.filter(
-              item => item.ftype === '储值'
-            );
-            this.reduceHistorys = response.data.data.filter(
-              item => item.ftype === '消费'
-            );
-          } else {
-            Toast(response.data.message);
-          }
-        },
-        response => {
-          Toast('车主信息绑定失败!请检查网络');
-        }
-      );
-    },
-    showDetail(itemno,itemname) {
-      this.$router.push({
-        path: '/memberItem',
-        name: 'MemberItem',
-        params: {
-          member: this.member,
-          cmpno: this.cmpno,
-          cardno: this.cardno,
-          itemno,
-          itemname,
-        },
-      });
     },
   },
 };
