@@ -45,7 +45,7 @@ export default {
       api.getMember(params).then(
         response => {
           if (!response.ok) {
-            Toast('车主信息绑定失败!请检查网络！');
+            Toast('会员信息查询失败!请检查网络！');
           }
           if (response.data.success) {
             Toast.clear();
@@ -53,11 +53,16 @@ export default {
             this.cardno = response.data.data.cardno;
             this.getBalance();
           } else {
-            Toast(response.data.message);
+              Dialog.alert({
+              message: '您还未绑定会员信息，请先到会员绑定菜单绑定会员信息！',
+            }).then(() => {
+              WeixinJSBridge.invoke('closeWindow',{},function(res){
+              });
+            });
           }
         },
         response => {
-          Toast('车主信息绑定失败!请检查网络');
+          Toast('会员信息查询失败!请稍后再试！');
         }
       );
     },

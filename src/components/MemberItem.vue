@@ -2,10 +2,6 @@
   <div class="container">
     <van-nav-bar class="title" title="会员项目历史" left-text="返回" left-arrow  @click-left="onClickLeft"/>
     <van-panel :title="member.name" :desc="member.classname" :status="member.cardno">
-      <van-cell-group>
-       <van-cell title="牌照号" :value="member.licensenum" />
-       <van-cell title="手机号" :value="member.mobile"/>
-      </van-cell-group>
     </van-panel>
      <van-panel :title="itemname" >
       <van-cell-group>
