@@ -18,7 +18,6 @@ export default {
   name: 'Member',
   data() {
     return {
-      openid: '',
       cmpno: this.$route.params.cmpno,
       member: this.$route.params.member,
       cardno: this.$route.params.cardno,
@@ -28,7 +27,6 @@ export default {
     };
   },
   mounted: function() {
-    this.openid = 'oYXbkskh5y8g6IyImR82i-maAQMs';
     this.getHistory();
   },
   methods: {

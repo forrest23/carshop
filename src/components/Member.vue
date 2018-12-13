@@ -1,13 +1,23 @@
 <template>
   <div class="container">
     <van-nav-bar class="title" title="我的会员" />
-    <van-panel :title="member.name" :desc="member.classname" :status="member.cardno">
+    <van-actionsheet
+     v-model="show"
+     :actions="actions"
+     cancel-text="取消"
+     @select="onSelect"
+     @cancel="onCancel"
+    />
+    <van-panel title="会员信息" >
       <van-cell-group>
-       <van-cell title="牌照号" :value="member.licensenum" />
-       <van-cell title="手机号" :value="member.mobile"/>
+       <van-cell title="会员姓名" icon="contact" :value="member.name" size="large" center />
+       <van-cell title="会员卡号" class="reset" icon="card" :value="member.cardno" @click="showSelect()" is-link arrow-direction="down"/>
+       <van-cell title="会员级别" icon="exchange" :value="member.classname"/>
+       <van-cell title="牌照号" icon="logistics" :value="member.licensenum" />
+       <van-cell title="手机号" icon="phone" :value="member.mobile"/>
       </van-cell-group>
     </van-panel>
-     <van-panel title="卡内余额" >
+     <van-panel title="卡内余额">
       <van-cell-group>
         <van-cell v-for="balance in balances" :key="balance.itemno" :title="balance.itemname" :value="balance.balance" @click="showDetail(balance.itemno,balance.itemname)" is-link />
       </van-cell-group>
@@ -22,20 +32,34 @@ export default {
   name: 'Member',
   data() {
     return {
+      show: false,
       active: 0,
       openid: '',
-      cmpno: this.$route.query.cmpno,
+      cmpno: this.$route.query.cmpno || '1001',
       member: {},
+      memberlist: [],
       balances: [],
       addHistorys: [],
       reduceHistorys: [],
+      actions: [],
     };
   },
   mounted: function() {
-    this.openid = this.$cookies.get('openid');
+    this.openid = this.$cookies.get('openid') || 'oYXbkskh5y8g6IyImR82i-maAQMs';
     this.getMember();
   },
   methods: {
+     onSelect(item) {
+      this.show = false;
+      this.member = this.memberlist.filter(
+          p => p.cardno === item.name
+      )[0];
+    },
+     onCancel(item) {
+    },
+    showSelect(){
+      this.show = true;
+    },
     getMember() {
       const params = {
         id: 'GetMember',
@@ -49,15 +73,21 @@ export default {
           }
           if (response.data.success) {
             Toast.clear();
-            this.member = response.data.data;
-            this.cardno = response.data.data.cardno;
+            this.memberlist = response.data.data;
+            this.memberlist.forEach(e => {
+                var item ={};
+                item.name = e.cardno;
+                item.subname = e.licensenum;
+                this.actions.push(item);
+            });
+            this.member = this.memberlist[0];
+            this.cardno = response.data.data[0].cardno;
             this.getBalance();
           } else {
-              Dialog.alert({
+            Dialog.alert({
               message: '您还未绑定会员信息，请先到会员绑定菜单绑定会员信息！',
             }).then(() => {
-              WeixinJSBridge.invoke('closeWindow',{},function(res){
-              });
+              WeixinJSBridge.invoke('closeWindow', {}, function(res) {});
             });
           }
         },
@@ -119,7 +149,7 @@ export default {
         }
       );
     },
-    showDetail(itemno,itemname) {
+    showDetail(itemno, itemname) {
       this.$router.push({
         path: '/memberItem',
         name: 'MemberItem',
@@ -138,22 +168,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1,
-h2 {
-  font-weight: normal;
-}
 .container {
   padding: 10px;
 }
-.title {
-  margin-bottom: 10px;
-}
-.logo {
-  width: 300px;
-  height: 130px;
-  margin-bottom: 10px;
-}
-.button {
-  margin-top: 25px;
-}
 </style>
+
