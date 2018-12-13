@@ -54,6 +54,8 @@ export default {
       this.member = this.memberlist.filter(
           p => p.cardno === item.name
       )[0];
+      this.cardno = this.member.cardno;
+      this.getBalance();
     },
      onCancel(item) {
     },
@@ -98,6 +100,10 @@ export default {
     },
 
     getBalance() {
+      Toast.loading({
+        mask: true,
+        message: '查询会员余额中...',
+      });
       const params = {
         id: 'GetMemberBalance',
         cmpno: this.cmpno,
