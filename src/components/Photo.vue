@@ -270,6 +270,7 @@ export default {
           this.carIdModel.register_date = result.register_date;
           this.carIdModel.owner = result.owner;
           this.carIdModel.addr = result.addr;
+          this.carIdModel.plate_num = result.plate_num;
           break;
         case 'idcard|face':
           this.carIdModel.name = result.name;
