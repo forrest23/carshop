@@ -77,7 +77,7 @@ export default {
             localStorage.setItem('companyname', this.companyname);
             localStorage.setItem('username', this.username);
             localStorage.setItem('password', this.password);
-            this.$router.push('/Photo');
+            this.$router.push('/');
             Toast.clear();
           }else{
             Toast('登录失败!用户名或密码错误！');

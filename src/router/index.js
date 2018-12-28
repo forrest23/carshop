@@ -6,6 +6,7 @@ import Photo from '@/components/Photo'
 import Register from '@/components/Register'
 import Member from '@/components/Member'
 import MemberItem from '@/components/MemberItem'
+import RepairOrder from '@/components/RepairOrder'
 
 import { Toast } from 'vant'
 
@@ -57,6 +58,13 @@ const router = new Router({
       component: MemberItem,
       meta: {
         check: false
+      }
+    }, {
+      path: '/repairOrder',
+      name: 'RepairOrder',
+      component: RepairOrder,
+      meta: {
+        check: true
       }
     }
   ]

@@ -4,10 +4,13 @@
     <div class="tools">
        <van-row type="flex" justify="space-around">
          <van-col span="6">
-           <van-icon name="photograph" size="48px" color="#2894FF" @click="onRouterTo"/>
-           <span>拍照识别</span>
+           <van-icon name="photograph" size="48px" color="#2894FF" @click="onRouterTo('智能识别')"/>
+           <span>智能识别</span>
           </van-col>
-         <van-col span="6"></van-col>
+           <van-col span="6">
+           <van-icon name="records" size="48px" color="#2894FF" @click="onRouterTo('维修接单')"/>
+           <span>维修接单</span>
+          </van-col>
          <van-col span="6"></van-col>
        </van-row>
     </div>
@@ -32,8 +35,17 @@ export default {
     this.username = sessionStorage.getItem('username') || '';
   },
   methods: {
-    onRouterTo() {
-      this.$router.push('/Photo');
+    onRouterTo(routerName) {
+      switch (routerName) {
+        case "智能识别":
+          this.$router.push('/Photo');
+          break;
+        case "维修接单":
+          this.$router.push('/RepairOrder');
+          break;
+        default:
+          break;
+      }
     },
     onClickLeft() {},
     onClickRight() {

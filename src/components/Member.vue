@@ -112,7 +112,7 @@ export default {
       api.getMemberBalance(params).then(
         response => {
           if (!response.ok) {
-            Toast('车主信息绑定失败!请检查网络！');
+            Toast('查询会员余额失败!请检查网络！');
           }
           if (response.data.success) {
             Toast.clear();
@@ -122,7 +122,7 @@ export default {
           }
         },
         response => {
-          Toast('车主信息绑定失败!请检查网络');
+          Toast('查询会员余额失败!请检查网络');
         }
       );
     },
