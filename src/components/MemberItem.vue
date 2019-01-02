@@ -5,7 +5,7 @@
     </van-panel>
      <van-panel :title="itemname" >
       <van-cell-group>
-        <van-cell v-for="history in historys" :key="history.serialno" :title="history.itemname" :value="history.qty" :label="history.regdate" />
+        <van-cell v-for="(history, index) in historys" :key="index" :title="history.itemname" :value="history.qty" :label="history.regdate" />
       </van-cell-group>
     </van-panel>
   </div>

@@ -1,46 +1,43 @@
 <template>
   <div class="container">
-    <van-nav-bar class="title" title="维修接单" />
-    <van-panel title="委托书">
+    <van-nav-bar class="title" title="新建车辆" />
+
+    <van-panel title="车辆信息">
       <van-cell-group>
-       <van-cell title="委托书号">
-         <van-icon slot="right-icon" name="add" class="custom-icon" />
-         <van-icon slot="right-icon" name="search" class="custom-icon" @click="onShowRepairOrder()"/>
-       </van-cell>
-       <van-field v-model="order.licensenum" center clearable label="牌照号" placeholder="请输入或识别牌照号">
-            <van-button slot="button" size="small" type="primary">智能识别</van-button>
-            <van-button slot="button" size="small" type="primary">新车车辆</van-button>
+       <van-field v-model="car.licensenum" center clearable label="牌照号" placeholder="请输入或识别牌照号">
+         <van-button slot="button" size="small" type="primary">智能识别</van-button>
        </van-field>
-       <van-cell title="车型名称"  :value="order.carmodel"/>
-       <van-cell title="会员卡号"  :value="order.cardno" />
-       <van-cell title="客户名称"  :value="order.custname"/>
-       <van-cell title="联系人"  :value="order.contact"/>
-       <van-cell title="联系电话"  :value="order.mobile"/>
-       <van-cell title="修理类型" :value="order.repairType" @click="onShowRepairType()" is-link arrow-direction="down" />
-       <van-field v-model="order.mileage" center clearable label="公里数" placeholder="请输入公里数"></van-field>
-       <van-cell title="工时单价" :value="order.price"/>
-       <van-cell title="预计交车时间" @click="onShowDateSelect()" :value="order.completeTime">
+       <van-field v-model="car.vin" center clearable label="底盘号" placeholder="请输入底盘号">
+       </van-field>
+        <van-field v-model="car.engineno" center clearable label="发动机号" placeholder="请输入底盘号">
+       </van-field>
+       <van-cell title="车型" @click="onShowDateSelect()" :value="order.carmodel">
          <van-icon slot="right-icon" name="search" class="custom-icon" />
        </van-cell>
-        <van-cell title="维修项目" @click="onShowRepairItem()">
+       <van-cell title="领证日期" @click="onShowDateSelect()" :value="order.register_date">
          <van-icon slot="right-icon" name="search" class="custom-icon" />
        </van-cell>
       </van-cell-group>
-
-  <van-row v-for="(item, index) in selectRepairItem" :key="index">
-    <van-col span="8"><van-cell :title="item.itemno" /></van-col>
-    <van-col span="12"><van-cell :title="item.itemname" /></van-col>
-   </van-row>
-
     </van-panel>
-     <!-- <van-panel title="维修项目">
-        <van-icon slot="right-icon" name="search" class="custom-icon" />
-     </van-panel> -->
+
+    <van-panel title="客户信息">
+      <van-cell-group>
+       <van-field v-model="car.custno" center clearable label="客户号" placeholder="请输入或选择客户号">
+         <van-button slot="button" size="small" type="primary" @click="onShowCust()">选择</van-button>
+       </van-field>
+       <van-field v-model="car.custname" center clearable label="客户名称" placeholder="请输入客户名称"/>
+       <van-field v-model="car.contact" center clearable label="联系人" placeholder="请输入客户名称"/>  
+       <van-field v-model="car.mobile" center clearable label="联系电话" placeholder="请输入联系电话"/>  
+       <van-field v-model="car.idnum" center clearable label="身份证号" placeholder="请输入身份证号"/>  
+       <van-field v-model="car.address" center clearable label="联系地址" placeholder="请输入联系地址"/>  
+      </van-cell-group>
+    </van-panel>
+
     <van-popup v-model="show" position="bottom" :overlay="true">
      <van-datetime-picker
       v-model="currentDate"
-      title="选择预计交车时间"
-      type="datetime"
+      title="选择领证日期"
+      type="date"
       :min-date="minDate"
       :max-date="maxDate"
       @confirm="onDateSelect"
@@ -48,15 +45,15 @@
      />
     </van-popup>
 
-   <van-popup v-model="showRepairItem" position="right" :overlay="true">
-    <van-search v-model="searchRepairItemWord"
+   <van-popup v-model="showCust" position="right" :overlay="true">
+    <van-search v-model="searchCustWord"
     placeholder="请输入搜索关键词"
-    @search="onSearchRepairItem"
-    @cancel="onSearchRepairItemCancel" />
+    @search="onSearchCust"
+    @cancel="onSearchCustCancel" />
 
   <van-row>
-    <van-col span="8"><van-cell value="项目代码" /></van-col>
-    <van-col span="12"><van-cell value="项目名称" /></van-col>
+    <van-col span="8"><van-cell value="客户号" /></van-col>
+    <van-col span="12"><van-cell value="客户名称" /></van-col>
   </van-row>
 
    <van-list
@@ -68,47 +65,14 @@
    <van-row v-for="(item, index) in balances" :key="index">
     <van-col span="8"><van-cell :title="item.itemno" /></van-col>
     <van-col span="12"><van-cell :title="item.itemname"  /></van-col>
-    <van-col span="4"><van-checkbox v-model="item.checked" @change="onSelectRepairItem()" /></van-col>
+    <van-col span="4"><van-checkbox v-model="item.checked" @change="onSelectCust()" /></van-col>
    </van-row>
    </van-list>
    </van-popup>
 
-   <van-popup v-model="showRepairOrder" position="right" :overlay="true">
-    <van-search v-model="searchRepairOrder"
-    placeholder="请输入搜索关键词"
-    @search="onSearchRepairOrder"
-    @cancel="onSearchRepairOrderCancel" />
-
-  <van-row>
-    <van-col span="6"><van-cell value="委托书号" /></van-col>
-    <van-col span="6"><van-cell value="牌照号" /></van-col>
-    <van-col span="6"><van-cell value="服务顾问" /></van-col>
-    <van-col span="6"><van-cell value="修理类型" /></van-col>
-  </van-row>
-
-   <van-list
-     v-model="loading"
-     :finished="finished"
-     finished-text="没有更多了"
-     @load="getBalance"
-   >
-   <van-row v-for="(item, index) in balances" :key="index">
-    <van-col span="6"><van-cell :title="item.itemno" /></van-col>
-    <van-col span="6"><van-cell :title="item.itemname"  /></van-col>
-    <van-col span="6"><van-cell :title="item.itemname"  /></van-col>
-    <van-col span="6"><van-cell :title="item.itemname"  /></van-col>
-    <van-col span="6"><van-checkbox v-model="item.checked" @change="onSelectRepairItem()" /></van-col>
-   </van-row>
-   </van-list>
+   <van-popup v-model="showCarModel" position="right" :overlay="true">
+    <van-picker :columns="columns" @change="onChange" />
    </van-popup>
-
-     <van-actionsheet
-     v-model="ShowRepairType"
-     :actions="repairTypes"
-     cancel-text="取消"
-     @select="onSelectRepairType"
-     @cancel="onCancelRepairType"
-    />
 
   </div>
 </template>
@@ -117,13 +81,13 @@
 import { Toast, Dialog } from 'vant';
 import api from '../api';
 export default {
-  name: 'RepairOrder',
+  name: 'CreateCar',
   data() {
     return {
       show: false,
-      showRepairItem: false,
+      showCust: false,
       showRepairOrder:false,
-      ShowRepairType: false,
+      showCarModel: false,
       minHour: 10,
       maxHour: 20,
       minDate: new Date(2018, 0, 1),
@@ -134,6 +98,7 @@ export default {
       selectRepairItem: [],
       searchRepairItemWord: '',
       searchRepairOrder:'',
+      searchCustWord:'',
       balances: [],
       loading: false,
       finished: false,
@@ -141,31 +106,35 @@ export default {
 
       active: 0,
       openid: '',
-      cmpno: this.$route.query.cmpno || '1001',
       member: {},
       order: {},
+      car:{},
     };
   },
   mounted: function() {
-    this.openid = this.$cookies.get('openid') || 'oYXbkskh5y8g6IyImR82i-maAQMs';
     //this.getBalance();
   },
   methods: {
-     onShowRepairType() {
-      this.ShowRepairType = true;
+     onShowCust() {
+      this.showCust = true;
     },
-    onSelectRepairType(item) {
-      this.order.repairType = item.name;
-      this.ShowRepairType = false;
+    onSelectCust(item) {
+      this.showCust = false;
     },
-    onCancelRepairType() {
-      this.ShowRepairType = false;
+    onCancelCust() {
+      this.showCust = false;
+    },
+    onSearchCust(){
+
+    },
+    onSearchCustCancel(){
+
     },
 
     onDateSelect() {
       this.show = false;
       this.order.completeTime = this.dateFtt(
-        'yyyy-MM-dd hh:mm',
+        'yyyy-MM-dd',
         this.currentDate
       );
     },

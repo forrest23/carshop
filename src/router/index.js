@@ -7,6 +7,7 @@ import Register from '@/components/Register'
 import Member from '@/components/Member'
 import MemberItem from '@/components/MemberItem'
 import RepairOrder from '@/components/RepairOrder'
+import CreateCar from '@/components/CreateCar'
 
 import { Toast } from 'vant'
 
@@ -64,7 +65,14 @@ const router = new Router({
       name: 'RepairOrder',
       component: RepairOrder,
       meta: {
-        check: true
+        check: false
+      }
+    }, {
+      path: '/createCar',
+      name: 'CreateCar',
+      component: CreateCar,
+      meta: {
+        check: false
       }
     }
   ]
