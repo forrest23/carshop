@@ -1,39 +1,51 @@
 <template>
   <div class="container">
-    <van-nav-bar class="title" title="新建车辆" />
-
+    <van-nav-bar class="title" title="新建车辆" left-text="返回" left-arrow  @click-left="onClickLeft"/>
     <van-panel title="车辆信息">
+
+            <van-row class="button-row">
+  <van-col span="22"><van-field v-model="car.plate_num" required center clearable label="牌照号" placeholder="请输入或识别牌照号"/></van-col>
+  <van-col span="2" class="button-col" ><van-uploader  :after-read="onReadVehicle" accept="image/jpg" >
+             <van-icon name="photograph" />
+           </van-uploader></van-col>
+</van-row>
       <van-cell-group>
-       <van-field v-model="car.licensenum" center clearable label="牌照号" placeholder="请输入或识别牌照号">
-         <van-button slot="button" size="small" type="primary">智能识别</van-button>
-       </van-field>
        <van-field v-model="car.vin" center clearable label="底盘号" placeholder="请输入底盘号">
        </van-field>
-        <van-field v-model="car.engineno" center clearable label="发动机号" placeholder="请输入底盘号">
+        <van-field v-model="car.engine_num" center clearable label="发动机号" placeholder="请输入发动机号">
        </van-field>
-       <van-cell title="车型" @click="onShowDateSelect()" :value="order.carmodel">
-         <van-icon slot="right-icon" name="search" class="custom-icon" />
+       <van-cell title="车型" @click="onCarModelSelect()" :value="car.carmodel">
+         <van-icon slot="right-icon" name="arrow" class="custom-icon" />
        </van-cell>
-       <van-cell title="领证日期" @click="onShowDateSelect()" :value="order.register_date">
-         <van-icon slot="right-icon" name="search" class="custom-icon" />
+       <van-cell title="领证日期" @click="onShowDateSelect()" :value="car.register_date">
+         <van-icon slot="right-icon" name="clock" class="custom-icon" />
        </van-cell>
       </van-cell-group>
     </van-panel>
 
     <van-panel title="客户信息">
       <van-cell-group>
-       <van-field v-model="car.custno" center clearable label="客户号" placeholder="请输入或选择客户号">
+       <!-- <van-field v-model="car.custno" center clearable label="客户号" placeholder="请输入或选择客户号">
+         <van-button slot="button" size="small" type="primary" @click="onShowCust()">选择</van-button>
+       </van-field> -->
+       <van-field v-model="car.custname" required center clearable label="客户名称" placeholder="请输入客户名称">
          <van-button slot="button" size="small" type="primary" @click="onShowCust()">选择</van-button>
        </van-field>
-       <van-field v-model="car.custname" center clearable label="客户名称" placeholder="请输入客户名称"/>
-       <van-field v-model="car.contact" center clearable label="联系人" placeholder="请输入客户名称"/>  
-       <van-field v-model="car.mobile" center clearable label="联系电话" placeholder="请输入联系电话"/>  
+       <van-field v-model="car.contact" required center clearable label="联系人" placeholder="请输入联系人">
+             <van-icon slot="icon" name="photograph" >
+               <van-uploader :after-read="onReadVehiclePlate" accept="image/jpg">
+               </van-uploader>
+               </van-icon>
+       </van-field>  
+       <van-field v-model="car.mobile" required center clearable label="联系电话" placeholder="请输入联系电话"/>  
        <van-field v-model="car.idnum" center clearable label="身份证号" placeholder="请输入身份证号"/>  
        <van-field v-model="car.address" center clearable label="联系地址" placeholder="请输入联系地址"/>  
       </van-cell-group>
     </van-panel>
 
-    <van-popup v-model="show" position="bottom" :overlay="true">
+    <van-button size="large" type="primary">提交</van-button>
+
+    <van-popup v-model="showDate" position="bottom" :overlay="true">
      <van-datetime-picker
       v-model="currentDate"
       title="选择领证日期"
@@ -71,7 +83,7 @@
    </van-popup>
 
    <van-popup v-model="showCarModel" position="right" :overlay="true">
-    <van-picker :columns="columns" @change="onChange" />
+    <van-area :area-list="areaList" />
    </van-popup>
 
   </div>
@@ -79,14 +91,15 @@
 
 <script>
 import { Toast, Dialog } from 'vant';
+import Compressor from 'compressorjs';
 import api from '../api';
 export default {
   name: 'CreateCar',
   data() {
     return {
-      show: false,
+      showDate: false,
       showCust: false,
-      showRepairOrder:false,
+      showRepairOrder: false,
       showCarModel: false,
       minHour: 10,
       maxHour: 20,
@@ -94,11 +107,10 @@ export default {
       maxDate: new Date(2019, 10, 1),
       currentDate: new Date(),
 
-      repairTypes: [{name:'事故车'},{name:'保养'},{name:'返修'}],
       selectRepairItem: [],
       searchRepairItemWord: '',
-      searchRepairOrder:'',
-      searchCustWord:'',
+      searchRepairOrder: '',
+      searchCustWord: '',
       balances: [],
       loading: false,
       finished: false,
@@ -108,14 +120,159 @@ export default {
       openid: '',
       member: {},
       order: {},
-      car:{},
+      car: {
+        fno: '',
+        fcmpno:'111',
+      },
+
+      citys: {
+        浙江: ['杭州', '宁波', '温州', '嘉兴', '湖州'],
+        福建: ['福州', '厦门', '莆田', '三明', '泉州'],
+      },
+
+      areaList: {
+        province_list: {
+          110000: '奥迪',
+          120000: '保时捷',
+        },
+        city_list: {
+          110100: 'A3',
+          110200: 'A4L',
+          120100: 'Cayenne',
+          120200: 'Macan',
+        },
+        county_list: {
+          110101: '2019款 Sportback 35 TFSI 进取型 国V',
+          110102: '2019款 Sportback 35 TFSI 时尚型 国V',
+          110105: '2019款 Limousine 40 TFSI 风尚型 国V',
+          110201: '2019款 45 TFSI quattro 个性运动版 国V',
+          120101: '2016款 Cayenne Platinum Edition 3.0T',
+          120102: '2018款 Cayenne 3.0T',
+          120201: '2017款 Macan GTS 3.0T',
+          120202: '2017款 Macan Turbo 3.6T',
+        },
+      },
     };
   },
   mounted: function() {
+    this.car.fname = sessionStorage.getItem('username') || '';
+    this.car.fcmpno = sessionStorage.getItem('companyno') || '';
+    this.car.fcmpname = localStorage.getItem('companyname') || '';
+    this.car.fno = new Date().getTime();
     //this.getBalance();
   },
+  computed: {
+    columns() {
+      const column = this.citys;
+      return [
+        {
+          values: Object.keys(column),
+          className: 'column1',
+        },
+        {
+          values: column[Object.keys(column)[0]],
+          className: 'column2',
+          defaultIndex: 2,
+        },
+      ];
+    },
+  },
   methods: {
-     onShowCust() {
+    onClickLeft() {
+      this.$router.back(-1);
+    },
+
+    onReadVehicle(file) {
+      this.uploadFile(file, 'vehicle|face');
+    },
+
+    uploadFile(file, type) {
+      Toast.loading({
+        mask: true,
+        message: '图片上传中...',
+      });
+    
+      var imageFile = this.dataURLtoFile(file.content, file.name);
+      var that = this;
+      new Compressor(imageFile, {
+        quality: 0.6,
+        success(result) {
+          const formData = new FormData();
+          formData.append(
+            type + '|' + that.car.fno + '|' + that.car.fcmpno,
+            result,
+            imageFile.filename
+          );
+          api.uploadFile(formData).then(
+            response => {
+              if (!response.ok || response.status !== 200) {
+                Dialog.alert({
+                  title: '系统提示',
+                  message: '图片识别失败，请检查图片是否正确并且清晰！',
+                }).then(() => {});
+              }
+              that.setDataField(response, type);
+              Toast.clear();
+            },
+            response => {
+              Dialog.alert({
+                title: '系统提示',
+                message: '图片识别失败，请检查上传的图片是否正确！',
+              }).then(() => {});
+            }
+          );
+        },
+        error(err) {
+          Dialog.alert({
+            title: '系统提示',
+            message: '图片压缩失败！',
+          }).then(() => {});
+        },
+      });
+    },
+    dataURLtoFile(dataurl, filename) {
+      //将base64转换为文件
+      var arr = dataurl.split(','),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, { type: mime });
+    },
+
+    setDataField(response, type) {
+      console.log(response.bodyText);
+      var result = JSON.parse(response.bodyText);
+      switch (type) {
+        case 'vehicle|face':
+          this.car.plate_num = result.plate_num;
+          this.car.vin = result.vin;
+          this.car.engine_num = result.engine_num;
+          this.car.register_date = result.register_date;
+          break;
+        case 'idcard|face':
+          this.car.name = result.name;
+          this.car.nationality = result.nationality;
+          this.car.sex = result.sex;
+          this.car.num = result.num;
+          this.car.address = result.address;
+          break;
+        case 'driver|face':
+          this.car.driver_name = result.name;
+          this.car.driver_sex = result.sex;
+          this.car.vehicle_type = result.vehicle_type;
+          this.car.driver_addr = result.addr;
+          this.car.driver_end_date = result.end_date;
+          break;
+        default:
+          break;
+      }
+    },
+
+    onShowCust() {
       this.showCust = true;
     },
     onSelectCust(item) {
@@ -124,25 +281,18 @@ export default {
     onCancelCust() {
       this.showCust = false;
     },
-    onSearchCust(){
-
-    },
-    onSearchCustCancel(){
-
-    },
+    onSearchCust() {},
+    onSearchCustCancel() {},
 
     onDateSelect() {
-      this.show = false;
-      this.order.completeTime = this.dateFtt(
-        'yyyy-MM-dd',
-        this.currentDate
-      );
+      this.showDate = false;
+      this.car.register_date = this.dateFtt('yyyy-MM-dd', this.currentDate);
     },
     onDateCancel() {
-      this.show = false;
+      this.showDate = false;
     },
     onShowDateSelect() {
-      this.show = true;
+      this.showDate = true;
     },
 
     onSearchRepairItem() {},
@@ -154,12 +304,15 @@ export default {
       this.showRepairItem = true;
     },
 
-    onSearchRepairOrder(){},
-    onSearchRepairOrderCancel(){},
+    onSearchRepairOrder() {},
+    onSearchRepairOrderCancel() {},
     onShowRepairOrder() {
       this.showRepairOrder = true;
     },
 
+    onCarModelSelect() {
+      this.showCarModel = true;
+    },
 
     getBalance() {
       // const params = {
@@ -226,6 +379,10 @@ export default {
 .van-popup {
   width: 90%;
   height: 100%;
+}
+
+.button-col {
+  line-height: 44px;
 }
 </style>
 

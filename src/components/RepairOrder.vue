@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <van-nav-bar class="title" title="维修接单" />
+    <van-nav-bar class="title" title="维修接单" left-text="返回" left-arrow  @click-left="onClickLeft"/>
     <van-panel title="委托书">
       <van-cell-group>
        <van-cell title="委托书号">
@@ -9,7 +9,7 @@
        </van-cell>
        <van-field v-model="order.licensenum" center clearable label="牌照号" placeholder="请输入或识别牌照号">
             <van-button slot="button" size="small" type="primary">智能识别</van-button>
-            <van-button slot="button" size="small" type="primary">新车车辆</van-button>
+            <van-button slot="button" size="small" type="primary" @click="onCreateCar()">新车车辆</van-button>
        </van-field>
        <van-cell title="车型名称"  :value="order.carmodel"/>
        <van-cell title="会员卡号"  :value="order.cardno" />
@@ -151,6 +151,9 @@ export default {
     //this.getBalance();
   },
   methods: {
+    onClickLeft() {
+         this.$router.back(-1);
+    },
      onShowRepairType() {
       this.ShowRepairType = true;
     },
@@ -191,6 +194,15 @@ export default {
       this.showRepairOrder = true;
     },
 
+    onCreateCar(){
+     this.$router.push({
+        path: '/createCar',
+        name: 'CreateCar',
+        params: {
+          member: '',
+        },
+      });
+    },
 
     getBalance() {
       // const params = {
