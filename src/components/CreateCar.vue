@@ -1,49 +1,48 @@
 <template>
   <div class="container">
     <van-nav-bar class="title" title="新建车辆" left-text="返回" left-arrow  @click-left="onClickLeft"/>
-    <van-panel title="车辆信息">
-
+    <van-panel title="车辆信息" icon="logistics">
             <van-row class="button-row">
-  <van-col span="22"><van-field v-model="car.plate_num" required center clearable label="牌照号" placeholder="请输入或识别牌照号"/></van-col>
+  <van-col span="22"><van-field v-model="car.plate_num" required center clearable label="牌照号" placeholder="请输入或识别牌照号" :error-message="plateNumError"/></van-col>
   <van-col span="2" class="button-col" ><van-uploader  :after-read="onReadVehicle" accept="image/jpg" >
-             <van-icon name="photograph" />
+             <van-icon name="scan" size="20px"/>
            </van-uploader></van-col>
 </van-row>
-      <van-cell-group>
        <van-field v-model="car.vin" center clearable label="底盘号" placeholder="请输入底盘号">
        </van-field>
         <van-field v-model="car.engine_num" center clearable label="发动机号" placeholder="请输入发动机号">
        </van-field>
-       <van-cell title="车型" @click="onCarModelSelect()" :value="car.carmodel">
-         <van-icon slot="right-icon" name="arrow" class="custom-icon" />
-       </van-cell>
-       <van-cell title="领证日期" @click="onShowDateSelect()" :value="car.register_date">
-         <van-icon slot="right-icon" name="clock" class="custom-icon" />
-       </van-cell>
-      </van-cell-group>
+
+       <van-field v-model="car.carmodel" center readonly label="车型名称" @click="onCarModelSelect()" is-link arrow-direction="down"/> 
+
+     <van-field v-model="car.register_date" center readonly label="领证日期" @click="onShowDateSelect()" is-link arrow-direction="down"/> 
+
     </van-panel>
 
-    <van-panel title="客户信息">
-      <van-cell-group>
-       <!-- <van-field v-model="car.custno" center clearable label="客户号" placeholder="请输入或选择客户号">
-         <van-button slot="button" size="small" type="primary" @click="onShowCust()">选择</van-button>
-       </van-field> -->
-       <van-field v-model="car.custname" required center clearable label="客户名称" placeholder="请输入客户名称">
-         <van-button slot="button" size="small" type="primary" @click="onShowCust()">选择</van-button>
-       </van-field>
-       <van-field v-model="car.contact" required center clearable label="联系人" placeholder="请输入联系人">
-             <van-icon slot="icon" name="photograph" >
-               <van-uploader :after-read="onReadVehiclePlate" accept="image/jpg">
-               </van-uploader>
-               </van-icon>
-       </van-field>  
-       <van-field v-model="car.mobile" required center clearable label="联系电话" placeholder="请输入联系电话"/>  
-       <van-field v-model="car.idnum" center clearable label="身份证号" placeholder="请输入身份证号"/>  
+    <van-panel title="客户信息" icon="contact">
+         <van-row class="button-row">
+  <van-col span="22"><van-field v-model="car.custname" required center label="客户名称" :error-message="custnameError"/></van-col>
+  <van-col span="2" class="button-col" ><van-icon name="search" size="20px" @click="onShowCust()"/></van-col>
+</van-row>
+
+        <van-row class="button-row">
+  <van-col span="22"><van-field v-model="car.name" required center clearable label="联系人" placeholder="请输入联系人" :error-message="nameError"/></van-col>
+  <van-col span="2" class="button-col" ><van-uploader  :after-read="onReadDriver" accept="image/jpg" >
+             <van-icon name="scan" size="20px" />
+           </van-uploader></van-col>
+</van-row>
+       <van-field v-model="car.mobile" required center clearable label="联系电话" placeholder="请输入联系电话" :error-message="mobileError"/>  
+
+        <van-row class="button-row">
+  <van-col span="22"><van-field v-model="car.num"  center clearable label="身份证号" placeholder="请输入身份证号"/></van-col>
+  <van-col span="2" class="button-col" ><van-uploader  :after-read="onReadIdcard" accept="image/jpg" >
+             <van-icon name="scan" size="20px" />
+           </van-uploader></van-col>
+</van-row>
        <van-field v-model="car.address" center clearable label="联系地址" placeholder="请输入联系地址"/>  
-      </van-cell-group>
     </van-panel>
 
-    <van-button size="large" type="primary">提交</van-button>
+    <van-button size="large" type="primary" @click="onSubmit()">提交</van-button>
 
     <van-popup v-model="showDate" position="bottom" :overlay="true">
      <van-datetime-picker
@@ -57,15 +56,15 @@
      />
     </van-popup>
 
-   <van-popup v-model="showCust" position="right" :overlay="true">
+   <van-popup v-model="showCust" position="center" :overlay="true" class="van-popup-size">
     <van-search v-model="searchCustWord"
     placeholder="请输入搜索关键词"
     @search="onSearchCust"
     @cancel="onSearchCustCancel" />
 
   <van-row>
-    <van-col span="8"><van-cell value="客户号" /></van-col>
-    <van-col span="12"><van-cell value="客户名称" /></van-col>
+    <van-col span="6"><van-cell value="客户号" /></van-col>
+    <van-col span="18"><van-cell value="客户名称" /></van-col>
   </van-row>
 
    <van-list
@@ -75,15 +74,15 @@
      @load="getBalance"
    >
    <van-row v-for="(item, index) in balances" :key="index">
-    <van-col span="8"><van-cell :title="item.itemno" /></van-col>
-    <van-col span="12"><van-cell :title="item.itemname"  /></van-col>
-    <van-col span="4"><van-checkbox v-model="item.checked" @change="onSelectCust()" /></van-col>
+    <van-col span="6"><van-cell :title="item.custno" /></van-col>
+    <van-col span="16"><van-cell :title="item.custname"  /></van-col>
+    <van-col span="2"><van-checkbox v-model="item.checked" @change="onSelectCust(item)" /></van-col>
    </van-row>
    </van-list>
    </van-popup>
 
-   <van-popup v-model="showCarModel" position="right" :overlay="true">
-    <van-area :area-list="areaList" />
+   <van-popup v-model="showCarModel" position="center" :overlay="true" class="van-popup-size">
+    <van-area :area-list="areaList" @confirm="onCarModelConfirm" @cancel="onCarModelCancel"/>
    </van-popup>
 
   </div>
@@ -107,6 +106,11 @@ export default {
       maxDate: new Date(2019, 10, 1),
       currentDate: new Date(),
 
+      plateNumError: '',
+      custnameError: '',
+      nameError: '',
+      mobileError: '',
+
       selectRepairItem: [],
       searchRepairItemWord: '',
       searchRepairOrder: '',
@@ -122,8 +126,22 @@ export default {
       order: {},
       car: {
         fno: '',
-        fcmpno:'111',
+        fcmpno: '111',
+        plate_num: '',
+        vin: '',
+        engine_num: '',
+        register_date: '',
+        name: '',
+        num: '',
+        address: '',
+        mobile: '',
+        carmodel: '',
+        custname: '',
       },
+      customers: [
+        { custno: '0001', custname: '客户1', name: '客户1' },
+        { custno: '0001', custname: '客户2', name: '客户2' },
+      ],
 
       citys: {
         浙江: ['杭州', '宁波', '温州', '嘉兴', '湖州'],
@@ -182,8 +200,16 @@ export default {
       this.$router.back(-1);
     },
 
+    onReadDriver(file) {
+      this.uploadFile(file, 'driver|face');
+    },
+
     onReadVehicle(file) {
       this.uploadFile(file, 'vehicle|face');
+    },
+
+    onReadIdcard(file) {
+      this.uploadFile(file, 'idcard|face');
     },
 
     uploadFile(file, type) {
@@ -191,7 +217,7 @@ export default {
         mask: true,
         message: '图片上传中...',
       });
-    
+
       var imageFile = this.dataURLtoFile(file.content, file.name);
       var that = this;
       new Compressor(imageFile, {
@@ -254,18 +280,15 @@ export default {
           this.car.register_date = result.register_date;
           break;
         case 'idcard|face':
+          this.car.custname = result.name;
           this.car.name = result.name;
-          this.car.nationality = result.nationality;
-          this.car.sex = result.sex;
           this.car.num = result.num;
           this.car.address = result.address;
           break;
         case 'driver|face':
-          this.car.driver_name = result.name;
-          this.car.driver_sex = result.sex;
-          this.car.vehicle_type = result.vehicle_type;
-          this.car.driver_addr = result.addr;
-          this.car.driver_end_date = result.end_date;
+          this.car.custname = result.name;
+          this.car.name = result.name;
+          this.car.address = result.address;
           break;
         default:
           break;
@@ -277,6 +300,9 @@ export default {
     },
     onSelectCust(item) {
       this.showCust = false;
+      this.car.custname = item.custname;
+      this.car.name = item.name;
+      item.checked = false;
     },
     onCancelCust() {
       this.showCust = false;
@@ -293,6 +319,14 @@ export default {
     },
     onShowDateSelect() {
       this.showDate = true;
+    },
+
+    onCarModelCancel() {
+      this.showCarModel = false;
+    },
+    onCarModelConfirm(data) {
+      this.car.carmodel = data[2].name;
+      this.showCarModel = false;
     },
 
     onSearchRepairItem() {},
@@ -314,7 +348,54 @@ export default {
       this.showCarModel = true;
     },
 
+    onSubmit() {
+      if (this.car.plate_num === '') {
+        this.plateNumError = '请输入或识别牌照号';
+        return;
+      }
+      this.plateNumError = '';
+      if (this.car.custname === '') {
+        this.custnameError = '请输入客户名称';
+        return;
+      }
+      this.custnameError = '';
+      if (this.car.name === '') {
+        this.nameError = '请输入联系人';
+        return;
+      }
+      this.nameError = '';
+      if (this.car.mobile === '') {
+        this.mobileError = '请输入联系电话';
+        return;
+      }
+      this.mobileError = '';
+      
+
+      const toast = Toast.loading({
+        duration: 0, 
+        forbidClick: true, 
+        loadingType: 'spinner',
+        message: '正在创建车辆',
+      });
+
+      let second = 3;
+      const timer = setInterval(() => {
+        second--;
+        if (second) {
+        } else {
+          clearInterval(timer);
+          Toast.success('创建成功');
+          this.$eventHub.$emit('createCar', this.car);
+          this.$router.back(-1);
+        }
+      }, 1000);
+    },
+
     getBalance() {
+      this.balances = this.customers;
+      this.loading = false;
+      this.finished = true;
+
       // const params = {
       //   id: 'GetMemberBalance',
       //   cmpno: 'RL018080',
@@ -373,12 +454,12 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .container {
-  padding: 10px;
+  padding: 2px;
 }
 
-.van-popup {
-  width: 90%;
-  height: 100%;
+.van-popup-size {
+  width: 95%;
+  height: 70%;
 }
 
 .button-col {

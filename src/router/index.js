@@ -65,7 +65,8 @@ const router = new Router({
       name: 'RepairOrder',
       component: RepairOrder,
       meta: {
-        check: false
+        check: false,
+        isKeepAlive: true
       }
     }, {
       path: '/createCar',

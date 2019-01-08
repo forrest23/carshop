@@ -1,38 +1,54 @@
 <template>
   <div class="container">
     <van-nav-bar class="title" title="维修接单" left-text="返回" left-arrow  @click-left="onClickLeft"/>
-    <van-panel title="委托书">
       <van-cell-group>
-       <van-cell title="委托书号">
-         <van-icon slot="right-icon" name="add" class="custom-icon" />
-         <van-icon slot="right-icon" name="search" class="custom-icon" @click="onShowRepairOrder()"/>
+             <van-row class="button-row">
+  <van-col span="22"><van-field v-model="order.wtsh" required center readonly label="委托书号"/></van-col>
+  <van-col span="2" class="button-col" ><van-icon name="search" size="20px" @click="onShowRepairOrder()"/></van-col>
+</van-row>
+</van-cell-group>
+
+  <van-cell-group>
+             <van-row class="button-row">
+  <van-col span="20"><van-field v-model="order.plate_num" required center clearable label="牌照号" placeholder="请输入或识别牌照号" :error-message="plateNumError"/></van-col>
+  <van-col span="2" class="button-col" ><van-icon name="plus" size="20px" @click="onCreateCar()"/></van-col>
+  <van-col span="2" class="button-col" >
+    <van-uploader :after-read="onReadVehiclePlate" accept="image/jpg" >
+             <van-icon name="scan" size="20px" />
+           </van-uploader>
+    </van-col>
+</van-row>
+</van-cell-group>
+
+      <van-field v-model="order.carmodel" center readonly label="车型名称"/>
+      <van-field v-model="order.cardno" center readonly label="会员卡号"/>  
+      <van-field v-model="order.custname"  center readonly label="客户名称"/>  
+      <van-field v-model="order.name"  center readonly label="联系人"/>  
+      <van-field v-model="order.mobile"  center readonly label="联系电话"/>  
+      <van-field v-model="order.repairType" required center readonly label="修理类型" :error-message="repairTypeError" @click="onShowRepairType()" is-link arrow-direction="down"/>  
+       <van-field v-model="order.mileage" required center clearable label="公里数" :error-message="mileageError" placeholder="请输入公里数"></van-field>
+       <van-field v-model="order.price" center readonly label="工时单价"/>  
+       <van-field v-model="order.completeTime" center readonly label="预计交车" @click="onShowDateSelect()" is-link arrow-direction="down"/>  
+
+        <van-cell title="维修项目" @click="onShowRepairItem()" >
+         <van-icon slot="right-icon" name="search"  size="20px"/>
        </van-cell>
-       <van-field v-model="order.licensenum" center clearable label="牌照号" placeholder="请输入或识别牌照号">
-            <van-button slot="button" size="small" type="primary">智能识别</van-button>
-            <van-button slot="button" size="small" type="primary" @click="onCreateCar()">新车车辆</van-button>
-       </van-field>
-       <van-cell title="车型名称"  :value="order.carmodel"/>
-       <van-cell title="会员卡号"  :value="order.cardno" />
-       <van-cell title="客户名称"  :value="order.custname"/>
-       <van-cell title="联系人"  :value="order.contact"/>
-       <van-cell title="联系电话"  :value="order.mobile"/>
-       <van-cell title="修理类型" :value="order.repairType" @click="onShowRepairType()" is-link arrow-direction="down" />
-       <van-field v-model="order.mileage" center clearable label="公里数" placeholder="请输入公里数"></van-field>
-       <van-cell title="工时单价" :value="order.price"/>
-       <van-cell title="预计交车时间" @click="onShowDateSelect()" :value="order.completeTime">
-         <van-icon slot="right-icon" name="search" class="custom-icon" />
-       </van-cell>
-        <van-cell title="维修项目" @click="onShowRepairItem()">
-         <van-icon slot="right-icon" name="search" class="custom-icon" />
-       </van-cell>
-      </van-cell-group>
+
+        <van-row>
+    <van-col span="6"><van-cell value="项目代码" /></van-col>
+    <van-col span="6"><van-cell value="项目名称" /></van-col>
+    <van-col span="6"><van-cell value="收费工时" /></van-col>
+    <van-col span="6"><van-cell value="工时费" /></van-col>
+  </van-row>
 
   <van-row v-for="(item, index) in selectRepairItem" :key="index">
-    <van-col span="8"><van-cell :title="item.itemno" /></van-col>
-    <van-col span="12"><van-cell :title="item.itemname" /></van-col>
+    <van-col span="6"><van-cell :title="item.itemno" /></van-col>
+    <van-col span="6"><van-cell :title="item.itemname" /></van-col>
+    <van-col span="6"><van-cell :title="item.sfgs" /></van-col>
+    <van-col span="6"><van-cell :title="item.gsf" /></van-col>
    </van-row>
 
-    </van-panel>
+<van-button size="large" type="primary" @click="onSubmit()">提交</van-button>
      <!-- <van-panel title="维修项目">
         <van-icon slot="right-icon" name="search" class="custom-icon" />
      </van-panel> -->
@@ -48,7 +64,7 @@
      />
     </van-popup>
 
-   <van-popup v-model="showRepairItem" position="right" :overlay="true">
+   <van-popup v-model="showRepairItem" position="center" :overlay="true" class="van-popup-size">
     <van-search v-model="searchRepairItemWord"
     placeholder="请输入搜索关键词"
     @search="onSearchRepairItem"
@@ -60,20 +76,20 @@
   </van-row>
 
    <van-list
-     v-model="loading"
-     :finished="finished"
+     v-model="repairItemsloading"
+     :finished="repairItemsfinished"
      finished-text="没有更多了"
-     @load="getBalance"
+     @load="getRepairItems"
    >
-   <van-row v-for="(item, index) in balances" :key="index">
+   <van-row v-for="(item, index) in repairItems" :key="index">
     <van-col span="8"><van-cell :title="item.itemno" /></van-col>
     <van-col span="12"><van-cell :title="item.itemname"  /></van-col>
-    <van-col span="4"><van-checkbox v-model="item.checked" @change="onSelectRepairItem()" /></van-col>
+    <van-col span="4"><van-checkbox v-model="item.checked" @change="onSelectRepairItem(item, index)" /></van-col>
    </van-row>
    </van-list>
    </van-popup>
 
-   <van-popup v-model="showRepairOrder" position="right" :overlay="true">
+   <van-popup v-model="showRepairOrder" position="center" :overlay="true" class="van-popup-size">
     <van-search v-model="searchRepairOrder"
     placeholder="请输入搜索关键词"
     @search="onSearchRepairOrder"
@@ -87,17 +103,17 @@
   </van-row>
 
    <van-list
-     v-model="loading"
-     :finished="finished"
+     v-model="loadingwts"
+     :finished="finishedwts"
      finished-text="没有更多了"
-     @load="getBalance"
+     @load="onGetWts"
    >
-   <van-row v-for="(item, index) in balances" :key="index">
-    <van-col span="6"><van-cell :title="item.itemno" /></van-col>
-    <van-col span="6"><van-cell :title="item.itemname"  /></van-col>
-    <van-col span="6"><van-cell :title="item.itemname"  /></van-col>
-    <van-col span="6"><van-cell :title="item.itemname"  /></van-col>
-    <van-col span="6"><van-checkbox v-model="item.checked" @change="onSelectRepairItem()" /></van-col>
+   <van-row v-for="(item, index) in wts" :key="index">
+    <van-col span="5"><van-cell :title="item.wtsh" /></van-col>
+    <van-col span="7"><van-cell :title="item.plate_num"  /></van-col>
+    <van-col span="4"><van-cell :title="item.fwgw"  /></van-col>
+    <van-col span="5"><van-cell :title="item.repairType"  /></van-col>
+    <van-col span="3"><van-checkbox v-model="item.checked" @change="onSelectWts(item)" /></van-col>
    </van-row>
    </van-list>
    </van-popup>
@@ -115,6 +131,7 @@
 
 <script>
 import { Toast, Dialog } from 'vant';
+import Compressor from 'compressorjs';
 import api from '../api';
 export default {
   name: 'RepairOrder',
@@ -122,7 +139,7 @@ export default {
     return {
       show: false,
       showRepairItem: false,
-      showRepairOrder:false,
+      showRepairOrder: false,
       ShowRepairType: false,
       minHour: 10,
       maxHour: 20,
@@ -130,31 +147,100 @@ export default {
       maxDate: new Date(2019, 10, 1),
       currentDate: new Date(),
 
-      repairTypes: [{name:'事故车'},{name:'保养'},{name:'返修'}],
+      plateNumError: '',
+      repairTypeError: '',
+      mileageError: '',
+
+      wtslist: [
+        {
+          wtsh: '0001',
+          plate_num: '沪FA5V05',
+          fwgw: '小甲',
+          repairType: '保养',
+        },
+        {
+          wtsh: '0002',
+          plate_num: '沪EA5H87',
+          fwgw: '小已',
+          repairType: '事故车',
+        },
+        {
+          wtsh: '0003',
+          plate_num: '沪EA5H88',
+          fwgw: '小兵',
+          repairType: '返修',
+        },
+      ],
+      repairItems: [],
+      repairItemsRemote: [
+        { itemno: '0001', itemname: '大保养', sfgs: '10', gsf: '20.0' },
+        { itemno: '0002', itemname: '小保养', sfgs: '20', gsf: '20.0' },
+        { itemno: '0003', itemname: '事故车维修', sfgs: '30', gsf: '25.0' },
+      ],
+
+      repairTypes: [{ name: '事故车' }, { name: '保养' }, { name: '返修' }],
       selectRepairItem: [],
       searchRepairItemWord: '',
-      searchRepairOrder:'',
-      balances: [],
-      loading: false,
-      finished: false,
+      searchRepairOrder: '',
+      wts: [],
+      repairItemsloading: false,
+      repairItemsfinished: false,
+      loadingwts: false,
+      finishedwts: false,
       result: [],
 
       active: 0,
       openid: '',
       cmpno: this.$route.query.cmpno || '1001',
       member: {},
-      order: {},
+      order: {
+        wtsh: '',
+        plate_num: '',
+        carmodel: '',
+        cardno: '',
+        custname: '',
+        name: '',
+        mobile: '',
+        repairType: '',
+        mileage: '',
+        price: '',
+        completeTime: '',
+      },
     };
   },
+
+  created: function() {
+    this.$eventHub.$on('createCar', this.getCar);
+  },
+  beforeDestroy() {
+    this.$eventHub.$off('createCar');
+  },
+
   mounted: function() {
     this.openid = this.$cookies.get('openid') || 'oYXbkskh5y8g6IyImR82i-maAQMs';
-    //this.getBalance();
+    this.order.fname = sessionStorage.getItem('username') || '';
+    this.order.fcmpno = sessionStorage.getItem('companyno') || '';
+    this.order.fcmpname = localStorage.getItem('companyname') || '';
+    this.order.fno = new Date().getTime();
+    this.order.wtsh = new Date().getTime();
   },
+
   methods: {
-    onClickLeft() {
-         this.$router.back(-1);
+    getCar(car) {
+      this.order.name = car.name;
+      this.order.mobile = car.mobile;
+      this.order.plate_num = car.plate_num;
+      this.order.carmodel = car.carmodel;
+      this.order.custname = car.custname;
     },
-     onShowRepairType() {
+    onClickLeft() {
+      for (var key in this.order) {
+        this.order[key] = '';
+      }
+      this.selectRepairItem = [];
+      this.$router.back(-1);
+    },
+    onShowRepairType() {
       this.ShowRepairType = true;
     },
     onSelectRepairType(item) {
@@ -181,21 +267,39 @@ export default {
 
     onSearchRepairItem() {},
     onSearchRepairItemCancel() {},
-    onSelectRepairItem() {
-      this.selectRepairItem = this.balances.filter(p => p.checked == true);
+    onSelectRepairItem(item, index) {
+      this.showRepairItem = false;
+      if (item.checked) {
+        this.selectRepairItem.push(item);
+      } else {
+        this.selectRepairItem.splice(index, 1);
+      }
     },
     onShowRepairItem() {
       this.showRepairItem = true;
     },
 
-    onSearchRepairOrder(){},
-    onSearchRepairOrderCancel(){},
+    onGetWts() {
+      this.wts = this.wtslist;
+      this.loadingwts = false;
+      this.finishedwts = false;
+    },
+    onSelectWts(item) {
+      this.showRepairOrder = false;
+      this.order.wtsh = item.wtsh;
+      this.order.plate_num = item.plate_num;
+      this.order.repairType = item.repairType;
+      item.checked = false;
+    },
+
+    onSearchRepairOrder() {},
+    onSearchRepairOrderCancel() {},
     onShowRepairOrder() {
       this.showRepairOrder = true;
     },
 
-    onCreateCar(){
-     this.$router.push({
+    onCreateCar() {
+      this.$router.push({
         path: '/createCar',
         name: 'CreateCar',
         params: {
@@ -204,33 +308,58 @@ export default {
       });
     },
 
-    getBalance() {
-      // const params = {
-      //   id: 'GetMemberBalance',
-      //   cmpno: 'RL018080',
-      //   cardno: 'RL001060001',
-      // };
-      // api.getMemberBalance(params).then(
-      //   response => {
-      //     if (!response.ok) {
-      //       this.loading = false;
-      //       Toast('查询会员余额失败!请检查网络！');
-      //     }
-      //     if (response.data.success) {
-      //       this.balances = response.data.data;
-      //       this.loading = false;
-      //       this.finished = true;
-      //     } else {
-      //       this.loading = false;
-      //       Toast(response.data.message);
-      //     }
-      //   },
-      //   response => {
-      //     this.loading = false;
-      //     Toast('查询会员余额失败!请检查网络');
-      //   }
-      // );
+    getRepairItems() {
+      this.repairItems = this.repairItemsRemote;
+      this.repairItemsloading = false;
+      this.repairItemsfinished = true;
     },
+
+    onSubmit() {
+      if (this.order.plate_num === '') {
+        this.plateNumError = '请输入或识别牌照号';
+        return;
+      }
+      this.plateNumError = '';
+
+      if (this.order.repairType === '') {
+        this.repairTypeError = '请选择修理类型';
+        return;
+      }
+      this.repairTypeError = '';
+
+      if (this.order.mileage === '') {
+        this.mileageError = '请选输入公里数';
+        return;
+      }
+      this.mileageError = '';
+      if (this.selectRepairItem.length == 0) {
+        Toast.fail('请选择维修项目');
+        return;
+      }
+
+      const toast = Toast.loading({
+        duration: 0, // 持续展示 toast
+        forbidClick: true, // 禁用背景点击
+        loadingType: 'spinner',
+        message: '正在提交数据',
+      });
+
+      let second = 3;
+      const timer = setInterval(() => {
+        second--;
+        if (second) {
+        } else {
+          clearInterval(timer);
+          for (var key in this.order) {
+            this.order[key] = '';
+          }
+          this.selectRepairItem = [];
+          this.order.wtsh = new Date().getTime();
+          Toast.success('提交成功');
+        }
+      }, 1000);
+    },
+
     dateFtt(fmt, date) {
       var o = {
         'M+': date.getMonth() + 1, //月份
@@ -256,6 +385,79 @@ export default {
           );
       return fmt;
     },
+
+    onReadVehiclePlate(file) {
+      this.uploadFile(file, 'vehiclePlate|face');
+    },
+
+    uploadFile(file, type) {
+      Toast.loading({
+        mask: true,
+        message: '图片上传中...',
+      });
+
+      var imageFile = this.dataURLtoFile(file.content, file.name);
+      var that = this;
+      new Compressor(imageFile, {
+        quality: 0.6,
+        success(result) {
+          const formData = new FormData();
+          formData.append(
+            type + '|' + that.order.fno + '|' + that.order.fcmpno,
+            result,
+            imageFile.filename
+          );
+          api.uploadFile(formData).then(
+            response => {
+              if (!response.ok || response.status !== 200) {
+                Dialog.alert({
+                  title: '系统提示',
+                  message: '图片识别失败，请检查图片是否正确并且清晰！',
+                }).then(() => {});
+              }
+              that.setDataField(response, type);
+              Toast.clear();
+            },
+            response => {
+              Dialog.alert({
+                title: '系统提示',
+                message: '图片识别失败，请检查上传的图片是否正确！',
+              }).then(() => {});
+            }
+          );
+        },
+        error(err) {
+          Dialog.alert({
+            title: '系统提示',
+            message: '图片压缩失败！',
+          }).then(() => {});
+        },
+      });
+    },
+    dataURLtoFile(dataurl, filename) {
+      //将base64转换为文件
+      var arr = dataurl.split(','),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, { type: mime });
+    },
+
+    setDataField(response, type) {
+      console.log(response.bodyText);
+      var result = JSON.parse(response.bodyText);
+      switch (type) {
+        case 'vehiclePlate|face':
+          this.order.plate_num = result.plates[0].txt;
+          break;
+        default:
+          break;
+      }
+    },
   },
 };
 </script>
@@ -263,12 +465,20 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .container {
-  padding: 10px;
+  padding: 2px;
 }
 
-.van-popup {
-  width: 90%;
-  height: 100%;
+.van-popup-size {
+  width: 95%;
+  height: 70%;
+}
+
+.button-col {
+  line-height: 44px;
+}
+
+.padding-right {
+  padding-right: 10px;
 }
 </style>
 

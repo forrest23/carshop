@@ -32,6 +32,8 @@ Vue.use(VueCookies)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
+Vue.prototype.$eventHub = new Vue() // Global event bus
+
 new Vue({
   el: '#app',
   router,
