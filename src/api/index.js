@@ -1,4 +1,5 @@
-import { FileResource, UserResource, CarIdResource, MemberResource, MemberBalanceResource } from './resources'
+import { FileResource, UserResource, CarIdResource, MemberResource,
+  MemberBalanceResource, WtsResource } from './resources'
 
 export default {
   getCompanyInfo: function () {
@@ -21,5 +22,8 @@ export default {
   },
   getMemberBalance: function (params) {
     return MemberBalanceResource.get(params)
+  },
+  getXllx: function (params) {
+    return WtsResource.get({id: 'GetXllx'})
   }
 }

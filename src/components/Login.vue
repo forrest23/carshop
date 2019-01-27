@@ -2,7 +2,7 @@
   <div class="login">
     <img class="logo" src="../assets/logo.png">
     <h2>{{ msg }}</h2>
-    <van-field label="公司名" placeholder="请输入公司名" v-model="companyname" left-icon="points-mall"></van-field>
+    <van-field label="公司名" placeholder="请输入公司名" v-model="companyname" left-icon="shop-o"></van-field>
     <van-field label="用户名" placeholder="请输入用户名" v-model="username" left-icon="contact"></van-field>
     <van-field label="密码" placeholder="请输入密码" type="password" v-model="password" left-icon="certificate"></van-field>
     <van-button class="loginButton" type="primary" size="large" @click="login">登陆</van-button>

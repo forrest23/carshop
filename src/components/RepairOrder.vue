@@ -178,7 +178,7 @@ export default {
         { itemno: '0003', itemname: '事故车维修', sfgs: '30', gsf: '25.0' },
       ],
 
-      repairTypes: [{ name: '事故车' }, { name: '保养' }, { name: '返修' }],
+      repairTypes: [],
       selectRepairItem: [],
       searchRepairItemWord: '',
       searchRepairOrder: '',
@@ -223,6 +223,7 @@ export default {
     this.order.fcmpname = localStorage.getItem('companyname') || '';
     this.order.fno = new Date().getTime();
     this.order.wtsh = new Date().getTime();
+    this.getXllx();
   },
 
   methods: {
@@ -232,6 +233,27 @@ export default {
       this.order.plate_num = car.plate_num;
       this.order.carmodel = car.carmodel;
       this.order.custname = car.custname;
+    },
+    getXllx() {
+      const params = {
+        id: 'getXllx',
+        cmpno: this.cmpno,
+      };
+      api.getXllx(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取修理类型失败!请检查网络！');
+          }
+          if (response.data.success) {
+            this.repairTypes = response.data.data;
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取修理类型失败!请检查网络');
+        }
+      );
     },
     onClickLeft() {
       for (var key in this.order) {
