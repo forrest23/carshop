@@ -3,7 +3,7 @@
     <van-nav-bar class="title" title="新建车辆" left-text="返回" left-arrow  @click-left="onClickLeft"/>
     <van-panel title="车辆信息" icon="logistics">
             <van-row class="button-row">
-  <van-col span="22"><van-field v-model="car.plate_num" required center clearable label="牌照号" placeholder="请输入或识别牌照号" :error-message="plateNumError"/></van-col>
+  <van-col span="22"><van-field v-model="car.plate_num" required center clearable label="牌照号" placeholder="请输入或识别牌照号" :error-message="plateNumError" @blur="onBlurPlateNum"/></van-col>
   <van-col span="2" class="button-col" ><van-uploader  :after-read="onReadVehicle" accept="image/jpg" >
              <van-icon name="scan" size="20px"/>
            </van-uploader></van-col>
@@ -149,26 +149,9 @@ export default {
       },
 
       areaList: {
-        province_list: {
-          110000: '奥迪',
-          120000: '保时捷',
-        },
-        city_list: {
-          110100: 'A3',
-          110200: 'A4L',
-          120100: 'Cayenne',
-          120200: 'Macan',
-        },
-        county_list: {
-          110101: '2019款 Sportback 35 TFSI 进取型 国V',
-          110102: '2019款 Sportback 35 TFSI 时尚型 国V',
-          110105: '2019款 Limousine 40 TFSI 风尚型 国V',
-          110201: '2019款 45 TFSI quattro 个性运动版 国V',
-          120101: '2016款 Cayenne Platinum Edition 3.0T',
-          120102: '2018款 Cayenne 3.0T',
-          120201: '2017款 Macan GTS 3.0T',
-          120202: '2017款 Macan Turbo 3.6T',
-        },
+        province_list: {},
+        city_list: {},
+        county_list: {},
       },
     };
   },
@@ -176,8 +159,9 @@ export default {
     this.car.fname = sessionStorage.getItem('username') || '';
     this.car.fcmpno = sessionStorage.getItem('companyno') || '';
     this.car.fcmpname = localStorage.getItem('companyname') || '';
+    this.car.plate_num = this.$route.params.plate_num;
     this.car.fno = new Date().getTime();
-    //this.getBalance();
+    this.getPP();
   },
   computed: {
     columns() {
@@ -196,6 +180,59 @@ export default {
     },
   },
   methods: {
+    onBlurPlateNum() {
+      const params = {
+        id: 'GetCL',
+        pzh: this.car.plate_num,
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取车辆信息失败!请检查网络！');
+          }
+          if (response.data.success) {
+            if (response.data.data.length > 0) {
+              Toast('该车辆信息已经存在！');
+            }
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取车辆信息失败!请检查网络');
+        }
+      );
+    },
+
+    getPP() {
+      const params = {
+        id: 'GetAllCllx',
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取车辆品牌信息失败!请检查网络！');
+          }
+          if (response.data.success) {
+            response.data.data.province_list.forEach(ele => {
+              this.areaList.province_list[ele.fxh] = ele.fvalue;
+            });
+            response.data.data.city_list.forEach(ele => {
+              this.areaList.city_list[ele.fxh] = ele.fvalue;
+            });
+            response.data.data.county_list.forEach(ele => {
+              this.areaList.county_list[ele.fxh] = ele.fvalue;
+            });
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取车辆品牌信息失败!请检查网络!');
+        }
+      );
+    },
+
     onClickLeft() {
       this.$router.back(-1);
     },
@@ -369,58 +406,58 @@ export default {
         return;
       }
       this.mobileError = '';
-      
 
       const toast = Toast.loading({
-        duration: 0, 
-        forbidClick: true, 
+        duration: 0,
+        forbidClick: true,
         loadingType: 'spinner',
         message: '正在创建车辆',
       });
 
-      let second = 3;
-      const timer = setInterval(() => {
-        second--;
-        if (second) {
-        } else {
-          clearInterval(timer);
-          Toast.success('创建成功');
-          this.$eventHub.$emit('createCar', this.car);
-          this.$router.back(-1);
+      api.SaveCl(this.car).then(
+        response => {
+          if (!response.ok) {
+            Dialog.alert({
+              title: '系统提示',
+              message: '车辆保存失败!请检查网络！',
+            }).then(() => {});
+          }
+          if (response.data.success) {
+            Toast.success('车辆保存成功！');
+            this.$eventHub.$emit('createCar', this.car);
+            this.$router.back(-1);
+          } else {
+            Dialog.alert({
+              title: '系统提示',
+              message: '车辆保存失败!请检查数据！',
+            }).then(() => {});
+          }
+        },
+        response => {
+          Dialog.alert({
+            title: '系统提示',
+            message: '车辆保存失败!请检查网络！',
+          }).then(() => {});
         }
-      }, 1000);
+      );
+
+      // let second = 3;
+      // const timer = setInterval(() => {
+      //   second--;
+      //   if (second) {
+      //   } else {
+      //     clearInterval(timer);
+      //     Toast.success('创建成功');
+      //     this.$eventHub.$emit('createCar', this.car);
+      //     this.$router.back(-1);
+      //   }
+      // }, 1000);
     },
 
     getBalance() {
       this.balances = this.customers;
       this.loading = false;
       this.finished = true;
-
-      // const params = {
-      //   id: 'GetMemberBalance',
-      //   cmpno: 'RL018080',
-      //   cardno: 'RL001060001',
-      // };
-      // api.getMemberBalance(params).then(
-      //   response => {
-      //     if (!response.ok) {
-      //       this.loading = false;
-      //       Toast('查询会员余额失败!请检查网络！');
-      //     }
-      //     if (response.data.success) {
-      //       this.balances = response.data.data;
-      //       this.loading = false;
-      //       this.finished = true;
-      //     } else {
-      //       this.loading = false;
-      //       Toast(response.data.message);
-      //     }
-      //   },
-      //   response => {
-      //     this.loading = false;
-      //     Toast('查询会员余额失败!请检查网络');
-      //   }
-      // );
     },
     dateFtt(fmt, date) {
       var o = {

@@ -23,7 +23,13 @@ export default {
   getMemberBalance: function (params) {
     return MemberBalanceResource.get(params)
   },
-  getXllx: function (params) {
-    return WtsResource.get({id: 'GetXllx'})
+  getWts: function (params) {
+    return WtsResource.get(params)
+  },
+  SaveCl: function (data) {
+    return WtsResource.save({id: 'SaveCl'}, data)
+  },
+  SaveWts: function (data) {
+    return WtsResource.save({id: 'SaveWts'}, data)
   }
 }

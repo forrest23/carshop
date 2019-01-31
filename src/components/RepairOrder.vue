@@ -10,7 +10,8 @@
 
   <van-cell-group>
              <van-row class="button-row">
-  <van-col span="20"><van-field v-model="order.plate_num" required center clearable label="牌照号" placeholder="请输入或识别牌照号" :error-message="plateNumError"/></van-col>
+  <van-col span="20"><van-field v-model="order.plate_num" required center clearable label="牌照号" 
+  placeholder="请输入或识别牌照号" :error-message="plateNumError" @blur="onBlurPlateNum"/></van-col>
   <van-col span="2" class="button-col" ><van-icon name="plus" size="20px" @click="onCreateCar()"/></van-col>
   <van-col span="2" class="button-col" >
     <van-uploader :after-read="onReadVehiclePlate" accept="image/jpg" >
@@ -41,11 +42,11 @@
     <van-col span="6"><van-cell value="工时费" /></van-col>
   </van-row>
 
-  <van-row v-for="(item, index) in selectRepairItem" :key="index">
-    <van-col span="6"><van-cell :title="item.itemno" /></van-col>
-    <van-col span="6"><van-cell :title="item.itemname" /></van-col>
-    <van-col span="6"><van-cell :title="item.sfgs" /></van-col>
-    <van-col span="6"><van-cell :title="item.gsf" /></van-col>
+  <van-row v-for="(item, index) in this.order.selectRepairItem" :key="index">
+    <van-col span="6"><van-cell :title="item.fgwh" /></van-col>
+    <van-col span="6"><van-cell :title="item.fxlnr" /></van-col>
+    <van-col span="6"><van-cell :title="item.fxlgs" /></van-col>
+    <van-col span="6"><van-cell :title="item.fpggs" /></van-col>
    </van-row>
 
 <van-button size="large" type="primary" @click="onSubmit()">提交</van-button>
@@ -82,8 +83,8 @@
      @load="getRepairItems"
    >
    <van-row v-for="(item, index) in repairItems" :key="index">
-    <van-col span="8"><van-cell :title="item.itemno" /></van-col>
-    <van-col span="12"><van-cell :title="item.itemname"  /></van-col>
+    <van-col span="8"><van-cell :title="item.fgwh" /></van-col>
+    <van-col span="12"><van-cell :title="item.fxlnr"  /></van-col>
     <van-col span="4"><van-checkbox v-model="item.checked" @change="onSelectRepairItem(item, index)" /></van-col>
    </van-row>
    </van-list>
@@ -109,10 +110,10 @@
      @load="onGetWts"
    >
    <van-row v-for="(item, index) in wts" :key="index">
-    <van-col span="5"><van-cell :title="item.wtsh" /></van-col>
-    <van-col span="7"><van-cell :title="item.plate_num"  /></van-col>
-    <van-col span="4"><van-cell :title="item.fwgw"  /></van-col>
-    <van-col span="5"><van-cell :title="item.repairType"  /></van-col>
+    <van-col span="5"><van-cell :title="item.fwtsh" /></van-col>
+    <van-col span="7"><van-cell :title="item.fpzh"  /></van-col>
+    <van-col span="4"><van-cell :title="item.fywjd"  /></van-col>
+    <van-col span="5"><van-cell :title="item.fxllx"  /></van-col>
     <van-col span="3"><van-checkbox v-model="item.checked" @change="onSelectWts(item)" /></van-col>
    </van-row>
    </van-list>
@@ -151,35 +152,12 @@ export default {
       repairTypeError: '',
       mileageError: '',
 
-      wtslist: [
-        {
-          wtsh: '0001',
-          plate_num: '沪FA5V05',
-          fwgw: '小甲',
-          repairType: '保养',
-        },
-        {
-          wtsh: '0002',
-          plate_num: '沪EA5H87',
-          fwgw: '小已',
-          repairType: '事故车',
-        },
-        {
-          wtsh: '0003',
-          plate_num: '沪EA5H88',
-          fwgw: '小兵',
-          repairType: '返修',
-        },
-      ],
+      wtslist: [],
       repairItems: [],
-      repairItemsRemote: [
-        { itemno: '0001', itemname: '大保养', sfgs: '10', gsf: '20.0' },
-        { itemno: '0002', itemname: '小保养', sfgs: '20', gsf: '20.0' },
-        { itemno: '0003', itemname: '事故车维修', sfgs: '30', gsf: '25.0' },
-      ],
+      repairItemsRemote: [],
 
       repairTypes: [],
-      selectRepairItem: [],
+
       searchRepairItemWord: '',
       searchRepairOrder: '',
       wts: [],
@@ -203,8 +181,10 @@ export default {
         mobile: '',
         repairType: '',
         mileage: '',
-        price: '',
+        price: 1,
         completeTime: '',
+        fywjd: '',
+        selectRepairItem: [],
       },
     };
   },
@@ -218,12 +198,14 @@ export default {
 
   mounted: function() {
     this.openid = this.$cookies.get('openid') || 'oYXbkskh5y8g6IyImR82i-maAQMs';
-    this.order.fname = sessionStorage.getItem('username') || '';
+    this.order.fywjd = sessionStorage.getItem('username') || '';
     this.order.fcmpno = sessionStorage.getItem('companyno') || '';
     this.order.fcmpname = localStorage.getItem('companyname') || '';
     this.order.fno = new Date().getTime();
-    this.order.wtsh = new Date().getTime();
+    //this.order.wtsh = new Date().getTime();
     this.getXllx();
+    this.getWts();
+    this.getXlxm();
   },
 
   methods: {
@@ -237,9 +219,8 @@ export default {
     getXllx() {
       const params = {
         id: 'getXllx',
-        cmpno: this.cmpno,
       };
-      api.getXllx(params).then(
+      api.getWts(params).then(
         response => {
           if (!response.ok) {
             Toast('获取修理类型失败!请检查网络！');
@@ -255,11 +236,99 @@ export default {
         }
       );
     },
+    getWts() {
+      const params = {
+        id: 'GetWts',
+        wtsh: '',
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取委托书列表失败!请检查网络！');
+          }
+          if (response.data.success) {
+            this.wtslist = response.data.data;
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取委托书列表失败!请检查网络');
+        }
+      );
+    },
+    getXlxm() {
+      const params = {
+        id: 'GetXlxm',
+        xlxm: '',
+        cxbz: '001',
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取修理项目失败!请检查网络！');
+          }
+          if (response.data.success) {
+            this.repairItems = response.data.data;
+            this.repairItemsRemote = response.data.data;
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取修理项目失败!请检查网络');
+        }
+      );
+    },
+    onBlurPlateNum() {
+      if (this.order.plate_num && this.order.plate_num.length > 0) {
+        const params = {
+          id: 'GetCL',
+          pzh: this.order.plate_num,
+        };
+        api.getWts(params).then(
+          response => {
+            if (!response.ok) {
+              Toast('获取车辆信息失败!请检查网络！');
+            }
+            if (response.data.success) {
+              if (response.data.data.length > 0) {
+                this.order.plate_num = response.data.data[0].fpzh;
+                this.order.carmodel = response.data.data[0].fcllx;
+                this.order.custname = response.data.data[0].fkhmc;
+                this.order.name = response.data.data[0].flxr;
+                this.order.mobile = response.data.data[0].fmobile;
+                this.order.cardno = response.data.data[0].fcardno;
+              } else {
+                Dialog.confirm({
+                  message: '未找到该牌照号的车辆，是否新建？',
+                })
+                  .then(() => {
+                    this.$router.push({
+                      path: '/createCar',
+                      name: 'CreateCar',
+                      params: {
+                        plate_num: this.order.plate_num,
+                      },
+                    });
+                  })
+                  .catch(() => {});
+              }
+            } else {
+              Toast(response.data.message);
+            }
+          },
+          response => {
+            Toast('获取车辆信息失败!请检查网络');
+          }
+        );
+      }
+    },
     onClickLeft() {
       for (var key in this.order) {
         this.order[key] = '';
       }
-      this.selectRepairItem = [];
+      this.order.selectRepairItem = [];
       this.$router.back(-1);
     },
     onShowRepairType() {
@@ -292,9 +361,9 @@ export default {
     onSelectRepairItem(item, index) {
       this.showRepairItem = false;
       if (item.checked) {
-        this.selectRepairItem.push(item);
+        this.order.selectRepairItem.push(item);
       } else {
-        this.selectRepairItem.splice(index, 1);
+        this.order.selectRepairItem.splice(index, 1);
       }
     },
     onShowRepairItem() {
@@ -308,9 +377,9 @@ export default {
     },
     onSelectWts(item) {
       this.showRepairOrder = false;
-      this.order.wtsh = item.wtsh;
-      this.order.plate_num = item.plate_num;
-      this.order.repairType = item.repairType;
+      this.order.wtsh = item.fwtsh;
+      this.order.plate_num = item.fpzh;
+      this.order.repairType = item.fxllx;
       item.checked = false;
     },
 
@@ -354,7 +423,7 @@ export default {
         return;
       }
       this.mileageError = '';
-      if (this.selectRepairItem.length == 0) {
+      if (this.order.selectRepairItem.length == 0) {
         Toast.fail('请选择维修项目');
         return;
       }
@@ -366,20 +435,53 @@ export default {
         message: '正在提交数据',
       });
 
-      let second = 3;
-      const timer = setInterval(() => {
-        second--;
-        if (second) {
-        } else {
-          clearInterval(timer);
-          for (var key in this.order) {
-            this.order[key] = '';
+      api.SaveWts(this.order).then(
+        response => {
+          if (!response.ok) {
+            Toast.clear();
+            Dialog.alert({
+              title: '系统提示',
+              message: '委托书保存失败!请检查网络！',
+            }).then(() => {});
           }
-          this.selectRepairItem = [];
-          this.order.wtsh = new Date().getTime();
-          Toast.success('提交成功');
+          if (response.data.success) {
+            Toast.success('委托书保存成功！');
+            for (var key in this.order) {
+              this.order[key] = '';
+            }
+            this.order.selectRepairItem = [];
+            Toast.success('提交成功');
+          } else {
+            Toast.clear();
+            Dialog.alert({
+              title: '系统提示',
+              message: '委托书失败!请检查数据！',
+            }).then(() => {});
+          }
+        },
+        response => {
+          Toast.clear();
+          Dialog.alert({
+            title: '系统提示',
+            message: '车辆保存失败!请检查网络！',
+          }).then(() => {});
         }
-      }, 1000);
+      );
+
+      // let second = 3;
+      // const timer = setInterval(() => {
+      //   second--;
+      //   if (second) {
+      //   } else {
+      //     clearInterval(timer);
+      //     for (var key in this.order) {
+      //       this.order[key] = '';
+      //     }
+      //     this.selectRepairItem = [];
+      //     this.order.wtsh = new Date().getTime();
+      //     Toast.success('提交成功');
+      //   }
+      // }, 1000);
     },
 
     dateFtt(fmt, date) {
