@@ -3,14 +3,15 @@
     <van-nav-bar class="title" title="维修接单" left-text="返回" left-arrow  @click-left="onClickLeft"/>
       <van-cell-group>
              <van-row class="button-row">
-  <van-col span="22"><van-field v-model="order.wtsh" required center readonly label="委托书号"/></van-col>
+  <van-col span="20"><van-field v-model="order.wtsh" required center readonly label="委托书号"/></van-col>
+  <van-col span="2" class="button-col" ><van-icon name="plus" size="20px" @click="onCreateRepairOrder()"/></van-col>
   <van-col span="2" class="button-col" ><van-icon name="search" size="20px" @click="onShowRepairOrder()"/></van-col>
 </van-row>
 </van-cell-group>
 
   <van-cell-group>
              <van-row class="button-row">
-  <van-col span="20"><van-field v-model="order.plate_num" required center clearable label="牌照号" 
+  <van-col span="20"><van-field v-model="order.plate_num" required center clearable label="牌照号" :readonly= "isOldWts"
   placeholder="请输入或识别牌照号" :error-message="plateNumError" @blur="onBlurPlateNum"/></van-col>
   <van-col span="2" class="button-col" ><van-icon name="plus" size="20px" @click="onCreateCar()"/></van-col>
   <van-col span="2" class="button-col" >
@@ -22,7 +23,7 @@
 </van-cell-group>
 
       <van-field v-model="order.carmodel" center readonly label="车型名称"/>
-      <van-field v-model="order.cardno" center readonly label="会员卡号"/>  
+      <van-field v-model="order.cardno" center readonly label="会员卡号" @click="showMember()" is-link arrow-direction="right" />  
       <van-field v-model="order.custname"  center readonly label="客户名称"/>  
       <van-field v-model="order.name"  center readonly label="联系人"/>  
       <van-field v-model="order.mobile"  center readonly label="联系电话"/>  
@@ -36,17 +37,21 @@
        </van-cell>
 
         <van-row>
-    <van-col span="6"><van-cell value="项目代码" /></van-col>
-    <van-col span="6"><van-cell value="项目名称" /></van-col>
+    <van-col span="10"><van-cell value="项目名称" /></van-col>
     <van-col span="6"><van-cell value="收费工时" /></van-col>
     <van-col span="6"><van-cell value="工时费" /></van-col>
+    <van-col span="2"><van-cell value="" /></van-col>
   </van-row>
 
   <van-row v-for="(item, index) in this.order.selectRepairItem" :key="index">
-    <van-col span="6"><van-cell :title="item.fgwh" /></van-col>
-    <van-col span="6"><van-cell :title="item.fxlnr" /></van-col>
-    <van-col span="6"><van-cell :title="item.fxlgs" /></van-col>
+    <van-col span="10"><van-field v-model="item.fxlnr" center/></van-col>
+    <van-col span="6"><van-field v-model="item.fxlgs" center type='number'/></van-col>
     <van-col span="6"><van-cell :title="item.fpggs" /></van-col>
+    <van-col span="2">
+      <van-cell class="vancell" @click="onRemoveRepairItem(index)" >
+         <van-icon slot="right-icon" name="clear"  size="20px"/>
+      </van-cell>
+    </van-col>
    </van-row>
 
 <van-button size="large" type="primary" @click="onSubmit()">提交</van-button>
@@ -138,6 +143,7 @@ export default {
   name: 'RepairOrder',
   data() {
     return {
+      isOldWts: false,
       show: false,
       showRepairItem: false,
       showRepairOrder: false,
@@ -202,7 +208,7 @@ export default {
     this.order.fcmpno = sessionStorage.getItem('companyno') || '';
     this.order.fcmpname = localStorage.getItem('companyname') || '';
     this.order.fno = new Date().getTime();
-    //this.order.wtsh = new Date().getTime();
+    this.createWtsh();
     this.getXllx();
     this.getWts();
     this.getXlxm();
@@ -215,6 +221,27 @@ export default {
       this.order.plate_num = car.plate_num;
       this.order.carmodel = car.carmodel;
       this.order.custname = car.custname;
+    },
+    createWtsh() {
+      const params = {
+        id: 'createWtsh',
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取委托书号失败!请检查网络！');
+          }
+          if (response.data.success) {
+            this.order.wtsh = response.data.data;
+            this.order.price = 1;
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取委托书号失败!请检查网络');
+        }
+      );
     },
     getXllx() {
       const params = {
@@ -328,6 +355,7 @@ export default {
       for (var key in this.order) {
         this.order[key] = '';
       }
+      this.createWtsh();
       this.order.selectRepairItem = [];
       this.$router.back(-1);
     },
@@ -362,14 +390,15 @@ export default {
       this.showRepairItem = false;
       if (item.checked) {
         this.order.selectRepairItem.push(item);
-      } else {
-        this.order.selectRepairItem.splice(index, 1);
+        item.checked = false;
       }
     },
     onShowRepairItem() {
       this.showRepairItem = true;
     },
-
+    onRemoveRepairItem(index) {
+      this.order.selectRepairItem.splice(index, 1);
+    },
     onGetWts() {
       this.wts = this.wtslist;
       this.loadingwts = false;
@@ -380,7 +409,11 @@ export default {
       this.order.wtsh = item.fwtsh;
       this.order.plate_num = item.fpzh;
       this.order.repairType = item.fxllx;
+      this.order.mileage = item.fgls;
+      this.order.price = item.fxlgsdj;
+      this.order.carmodel = item.fcllx;
       item.checked = false;
+      this.isOldWts = true;
     },
 
     onSearchRepairOrder() {},
@@ -390,6 +423,10 @@ export default {
     },
 
     onCreateCar() {
+      if (this.isOldWts) {
+        Toast('已有委托书不能修改牌照号！');
+        return;
+      }
       this.$router.push({
         path: '/createCar',
         name: 'CreateCar',
@@ -403,6 +440,28 @@ export default {
       this.repairItems = this.repairItemsRemote;
       this.repairItemsloading = false;
       this.repairItemsfinished = true;
+    },
+
+    showMember() {
+      if (this.order.cardno) {
+        this.$router.push({
+          path: '/memberBalance',
+          name: 'MemberBalance',
+          params: {
+            cmpno: this.cmpno,
+            cardno: this.order.cardno,
+          },
+        });
+      }
+    },
+
+    onCreateRepairOrder() {
+      this.isOldWts = false;
+      for (var key in this.order) {
+        this.order[key] = '';
+      }
+      this.order.selectRepairItem = [];
+      this.createWtsh();
     },
 
     onSubmit() {
@@ -467,21 +526,6 @@ export default {
           }).then(() => {});
         }
       );
-
-      // let second = 3;
-      // const timer = setInterval(() => {
-      //   second--;
-      //   if (second) {
-      //   } else {
-      //     clearInterval(timer);
-      //     for (var key in this.order) {
-      //       this.order[key] = '';
-      //     }
-      //     this.selectRepairItem = [];
-      //     this.order.wtsh = new Date().getTime();
-      //     Toast.success('提交成功');
-      //   }
-      // }, 1000);
     },
 
     dateFtt(fmt, date) {
@@ -511,6 +555,10 @@ export default {
     },
 
     onReadVehiclePlate(file) {
+      if (this.isOldWts) {
+        Toast('已有委托书不能修改牌照号！');
+        return;
+      }
       this.uploadFile(file, 'vehiclePlate|face');
     },
 
@@ -599,6 +647,10 @@ export default {
 
 .button-col {
   line-height: 44px;
+}
+
+.vancell {
+  padding-left: 0px;
 }
 
 .padding-right {

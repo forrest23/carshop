@@ -8,6 +8,7 @@ import Member from '@/components/Member'
 import MemberItem from '@/components/MemberItem'
 import RepairOrder from '@/components/RepairOrder'
 import CreateCar from '@/components/CreateCar'
+import MemberBalance from '@/components/MemberBalance'
 
 import { Toast } from 'vant'
 
@@ -74,6 +75,13 @@ const router = new Router({
       component: CreateCar,
       meta: {
         check: false
+      }
+    }, {
+      path: '/memberBalance',
+      name: 'MemberBalance',
+      component: MemberBalance,
+      meta: {
+        check: true
       }
     }
   ]
