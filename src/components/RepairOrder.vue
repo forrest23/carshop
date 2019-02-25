@@ -22,7 +22,7 @@
 </van-row>
 </van-cell-group>
 
-      <van-field v-model="order.carmodel" center readonly label="车型名称"/>
+      <van-field v-model="order.carmodel" center readonly label="车型名称" @click="onCarModelSelect()" is-link arrow-direction="down"/> 
       <van-field v-model="order.cardno" center readonly label="会员卡号" @click="showMember()" is-link arrow-direction="right" />  
       <van-field v-model="order.custname"  center readonly label="客户名称"/>  
       <van-field v-model="order.name"  center readonly label="联系人"/>  
@@ -55,9 +55,6 @@
    </van-row>
 
 <van-button size="large" type="primary" @click="onSubmit()">提交</van-button>
-     <!-- <van-panel title="维修项目">
-        <van-icon slot="right-icon" name="search" class="custom-icon" />
-     </van-panel> -->
     <van-popup v-model="show" position="bottom" :overlay="true">
      <van-datetime-picker
       v-model="currentDate"
@@ -73,6 +70,7 @@
    <van-popup v-model="showRepairItem" position="center" :overlay="true" class="van-popup-size">
     <van-search v-model="searchRepairItemWord"
     placeholder="请输入搜索关键词"
+    show-action
     @search="onSearchRepairItem"
     @cancel="onSearchRepairItemCancel" />
 
@@ -98,14 +96,16 @@
    <van-popup v-model="showRepairOrder" position="center" :overlay="true" class="van-popup-size">
     <van-search v-model="searchRepairOrder"
     placeholder="请输入搜索关键词"
+    show-action
     @search="onSearchRepairOrder"
     @cancel="onSearchRepairOrderCancel" />
 
   <van-row>
-    <van-col span="6"><van-cell value="委托书号" /></van-col>
-    <van-col span="6"><van-cell value="牌照号" /></van-col>
-    <van-col span="6"><van-cell value="服务顾问" /></van-col>
-    <van-col span="6"><van-cell value="修理类型" /></van-col>
+    <van-col span="7"><van-cell value="委托书号" /></van-col>
+    <van-col span="5"><van-cell value="牌照号" /></van-col>
+    <van-col span="5"><van-cell value="顾问" /></van-col>
+    <van-col span="5"><van-cell value="类型" /></van-col>
+    <van-col span="2"><van-cell value="" /></van-col>
   </van-row>
 
    <van-list
@@ -115,11 +115,11 @@
      @load="onGetWts"
    >
    <van-row v-for="(item, index) in wts" :key="index">
-    <van-col span="5"><van-cell :title="item.fwtsh" /></van-col>
-    <van-col span="7"><van-cell :title="item.fpzh"  /></van-col>
-    <van-col span="4"><van-cell :title="item.fywjd"  /></van-col>
+    <van-col span="7"><van-cell :title="item.fwtsh" /></van-col>
+    <van-col span="5"><van-cell :title="item.fpzh"  /></van-col>
+    <van-col span="5"><van-cell :title="item.fywjd"  /></van-col>
     <van-col span="5"><van-cell :title="item.fxllx"  /></van-col>
-    <van-col span="3"><van-checkbox v-model="item.checked" @change="onSelectWts(item)" /></van-col>
+    <van-col span="2"><van-checkbox v-model="item.checked" @change="onSelectWts(item)" /></van-col>
    </van-row>
    </van-list>
    </van-popup>
@@ -131,6 +131,10 @@
      @select="onSelectRepairType"
      @cancel="onCancelRepairType"
     />
+
+    <van-popup v-model="showCarModel" position="center" :overlay="true" class="van-popup-size">
+    <van-area :area-list="areaList" @confirm="onCarModelConfirm" @cancel="onCarModelCancel"/>
+   </van-popup>
 
   </div>
 </template>
@@ -148,6 +152,7 @@ export default {
       showRepairItem: false,
       showRepairOrder: false,
       ShowRepairType: false,
+      showCarModel: false,
       minHour: 10,
       maxHour: 20,
       minDate: new Date(2018, 0, 1),
@@ -158,10 +163,7 @@ export default {
       repairTypeError: '',
       mileageError: '',
 
-      wtslist: [],
       repairItems: [],
-      repairItemsRemote: [],
-
       repairTypes: [],
 
       searchRepairItemWord: '',
@@ -174,8 +176,7 @@ export default {
       result: [],
 
       active: 0,
-      openid: '',
-      cmpno: this.$route.query.cmpno || '1001',
+      cmpno: this.$route.query.cmpno,
       member: {},
       order: {
         wtsh: '',
@@ -192,6 +193,12 @@ export default {
         fywjd: '',
         selectRepairItem: [],
       },
+
+      areaList: {
+        province_list: {},
+        city_list: {},
+        county_list: {},
+      },
     };
   },
 
@@ -203,15 +210,15 @@ export default {
   },
 
   mounted: function() {
-    this.openid = this.$cookies.get('openid') || 'oYXbkskh5y8g6IyImR82i-maAQMs';
+    this.openid = this.$cookies.get('openid');
     this.order.fywjd = sessionStorage.getItem('username') || '';
     this.order.fcmpno = sessionStorage.getItem('companyno') || '';
     this.order.fcmpname = localStorage.getItem('companyname') || '';
     this.order.fno = new Date().getTime();
     this.createWtsh();
+    this.getPP();
     this.getXllx();
-    this.getWts();
-    this.getXlxm();
+ 
   },
 
   methods: {
@@ -274,7 +281,7 @@ export default {
             Toast('获取委托书列表失败!请检查网络！');
           }
           if (response.data.success) {
-            this.wtslist = response.data.data;
+            this.wts = response.data.data;
           } else {
             Toast(response.data.message);
           }
@@ -297,7 +304,6 @@ export default {
           }
           if (response.data.success) {
             this.repairItems = response.data.data;
-            this.repairItemsRemote = response.data.data;
           } else {
             Toast(response.data.message);
           }
@@ -307,6 +313,48 @@ export default {
         }
       );
     },
+
+     getPP() {
+      const params = {
+        id: 'GetAllCllx',
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取车辆品牌信息失败!请检查网络！');
+          }
+          if (response.data.success) {
+            response.data.data.province_list.forEach(ele => {
+              this.areaList.province_list[ele.fxh] = ele.fvalue;
+            });
+            response.data.data.city_list.forEach(ele => {
+              this.areaList.city_list[ele.fxh] = ele.fvalue;
+            });
+            response.data.data.county_list.forEach(ele => {
+              this.areaList.county_list[ele.fxh] = ele.fvalue;
+            });
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取车辆品牌信息失败!请检查网络!');
+        }
+      );
+    },
+
+
+    onCarModelSelect() {
+      this.showCarModel = true;
+    },
+    onCarModelCancel() {
+      this.showCarModel = false;
+    },
+    onCarModelConfirm(data) {
+      this.order.carmodel = data[2].name;
+      this.showCarModel = false;
+    },
+
     onBlurPlateNum() {
       if (this.order.plate_num && this.order.plate_num.length > 0) {
         const params = {
@@ -384,8 +432,12 @@ export default {
       this.show = true;
     },
 
-    onSearchRepairItem() {},
-    onSearchRepairItemCancel() {},
+    onSearchRepairItem() {
+        this.repairItems= this.repairItems.filter(p => p.fgwh.indexOf(this.searchRepairItemWord) > -1 || p.fxlnr.indexOf(this.searchRepairItemWord) > -1 );
+    },
+    onSearchRepairItemCancel() {
+       this.getXlxm();
+    },
     onSelectRepairItem(item, index) {
       this.showRepairItem = false;
       if (item.checked) {
@@ -400,7 +452,6 @@ export default {
       this.order.selectRepairItem.splice(index, 1);
     },
     onGetWts() {
-      this.wts = this.wtslist;
       this.loadingwts = false;
       this.finishedwts = false;
     },
@@ -416,9 +467,14 @@ export default {
       this.isOldWts = true;
     },
 
-    onSearchRepairOrder() {},
-    onSearchRepairOrderCancel() {},
+    onSearchRepairOrder() {
+      this.wts= this.wts.filter(p => p.fpzh.indexOf(this.searchRepairOrder) > -1 || p.fwtsh.indexOf(this.searchRepairOrder) > -1 );
+    },
+    onSearchRepairOrderCancel() {
+      this.getWts();
+    },
     onShowRepairOrder() {
+      this.getWts();
       this.showRepairOrder = true;
     },
 
@@ -437,7 +493,7 @@ export default {
     },
 
     getRepairItems() {
-      this.repairItems = this.repairItemsRemote;
+      this.getXlxm();   
       this.repairItemsloading = false;
       this.repairItemsfinished = true;
     },
@@ -462,6 +518,9 @@ export default {
       }
       this.order.selectRepairItem = [];
       this.createWtsh();
+      this.order.fywjd = sessionStorage.getItem('username') || '';
+      this.order.fcmpno = sessionStorage.getItem('companyno') || '';
+      this.order.fcmpname = localStorage.getItem('companyname') || '';
     },
 
     onSubmit() {
@@ -504,12 +563,8 @@ export default {
             }).then(() => {});
           }
           if (response.data.success) {
-            Toast.success('委托书保存成功！');
-            for (var key in this.order) {
-              this.order[key] = '';
-            }
-            this.order.selectRepairItem = [];
-            Toast.success('提交成功');
+            this.onCreateRepairOrder(); 
+            Toast.success('委托书提交成功');
           } else {
             Toast.clear();
             Dialog.alert({
@@ -641,7 +696,7 @@ export default {
 }
 
 .van-popup-size {
-  width: 95%;
+  width: 98%;
   height: 70%;
 }
 

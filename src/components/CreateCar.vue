@@ -59,23 +59,26 @@
    <van-popup v-model="showCust" position="center" :overlay="true" class="van-popup-size">
     <van-search v-model="searchCustWord"
     placeholder="请输入搜索关键词"
+    show-action
     @search="onSearchCust"
     @cancel="onSearchCustCancel" />
 
   <van-row>
     <van-col span="6"><van-cell value="客户号" /></van-col>
-    <van-col span="18"><van-cell value="客户名称" /></van-col>
+    <van-col span="10"><van-cell value="客户名称" /></van-col>
+    <van-col span="8"><van-cell value="联系人" /></van-col>
   </van-row>
 
    <van-list
      v-model="loading"
      :finished="finished"
      finished-text="没有更多了"
-     @load="getBalance"
+     @load="getCustomers"
    >
-   <van-row v-for="(item, index) in balances" :key="index">
-    <van-col span="6"><van-cell :title="item.custno" /></van-col>
-    <van-col span="16"><van-cell :title="item.custname"  /></van-col>
+   <van-row v-for="(item, index) in customers" :key="index">
+    <van-col span="6"><van-cell :title="item.fkhh" /></van-col>
+    <van-col span="10"><van-cell :title="item.fkhmc"  /></van-col>
+    <van-col span="6"><van-cell :title="item.flxr"  /></van-col>
     <van-col span="2"><van-checkbox v-model="item.checked" @change="onSelectCust(item)" /></van-col>
    </van-row>
    </van-list>
@@ -98,10 +101,8 @@ export default {
     return {
       showDate: false,
       showCust: false,
-      showRepairOrder: false,
       showCarModel: false,
-      minHour: 10,
-      maxHour: 20,
+
       minDate: new Date(2018, 0, 1),
       maxDate: new Date(2019, 10, 1),
       currentDate: new Date(),
@@ -111,22 +112,16 @@ export default {
       nameError: '',
       mobileError: '',
 
-      selectRepairItem: [],
-      searchRepairItemWord: '',
-      searchRepairOrder: '',
       searchCustWord: '',
-      balances: [],
       loading: false,
       finished: false,
       result: [],
 
       active: 0,
-      openid: '',
       member: {},
-      order: {},
       car: {
         fno: '',
-        fcmpno: '111',
+        fcmpno: '',
         plate_num: '',
         vin: '',
         engine_num: '',
@@ -137,11 +132,9 @@ export default {
         mobile: '',
         carmodel: '',
         custname: '',
+        custname: '',
       },
-      customers: [
-        { custno: '0001', custname: '客户1', name: '客户1' },
-        { custno: '0001', custname: '客户2', name: '客户2' },
-      ],
+      customers: [],
 
       citys: {
         浙江: ['杭州', '宁波', '温州', '嘉兴', '湖州'],
@@ -181,27 +174,29 @@ export default {
   },
   methods: {
     onBlurPlateNum() {
-      const params = {
-        id: 'GetCL',
-        pzh: this.car.plate_num,
-      };
-      api.getWts(params).then(
-        response => {
-          if (!response.ok) {
-            Toast('获取车辆信息失败!请检查网络！');
-          }
-          if (response.data.success) {
-            if (response.data.data.length > 0) {
-              Toast('该车辆信息已经存在！');
+      if (this.car.plate_num) {
+        const params = {
+          id: 'GetCL',
+          pzh: this.car.plate_num,
+        };
+        api.getWts(params).then(
+          response => {
+            if (!response.ok) {
+              Toast('获取车辆信息失败!请检查网络！');
             }
-          } else {
-            Toast(response.data.message);
+            if (response.data.success) {
+              if (response.data.data.length > 0) {
+                Toast('该车辆信息已经存在！');
+              }
+            } else {
+              Toast(response.data.message);
+            }
+          },
+          response => {
+            Toast('获取车辆信息失败!请检查网络');
           }
-        },
-        response => {
-          Toast('获取车辆信息失败!请检查网络');
-        }
-      );
+        );
+      }
     },
 
     getPP() {
@@ -229,6 +224,27 @@ export default {
         },
         response => {
           Toast('获取车辆品牌信息失败!请检查网络!');
+        }
+      );
+    },
+
+    getKh() {
+      const params = {
+        id: 'GetKh',
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取客户信息失败!请检查网络！');
+          }
+          if (response.data.success) {
+            this.customers = response.data.data;
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取客户信息失败!请检查网络!');
         }
       );
     },
@@ -333,19 +349,28 @@ export default {
     },
 
     onShowCust() {
+      this.getKh();
       this.showCust = true;
     },
     onSelectCust(item) {
       this.showCust = false;
-      this.car.custname = item.custname;
-      this.car.name = item.name;
+      this.car.custno = item.fkhh;
+      this.car.custname = item.fkhmc;
+      this.car.name = item.flxr;
+      this.car.num = item.fsfzh;
+      this.car.address = item.fdz;
+      this.car.mobile = item.fdh;
       item.checked = false;
     },
     onCancelCust() {
       this.showCust = false;
     },
-    onSearchCust() {},
-    onSearchCustCancel() {},
+    onSearchCust() {
+      this.customers= this.customers.filter(p => p.fkhmc.indexOf(this.searchCustWord) > -1 || p.flxr.indexOf(this.searchCustWord) > -1 );
+    },
+    onSearchCustCancel() {
+      this.getKh();
+    },
 
     onDateSelect() {
       this.showDate = false;
@@ -364,21 +389,6 @@ export default {
     onCarModelConfirm(data) {
       this.car.carmodel = data[2].name;
       this.showCarModel = false;
-    },
-
-    onSearchRepairItem() {},
-    onSearchRepairItemCancel() {},
-    onSelectRepairItem() {
-      this.selectRepairItem = this.balances.filter(p => p.checked == true);
-    },
-    onShowRepairItem() {
-      this.showRepairItem = true;
-    },
-
-    onSearchRepairOrder() {},
-    onSearchRepairOrderCancel() {},
-    onShowRepairOrder() {
-      this.showRepairOrder = true;
     },
 
     onCarModelSelect() {
@@ -440,22 +450,9 @@ export default {
           }).then(() => {});
         }
       );
-
-      // let second = 3;
-      // const timer = setInterval(() => {
-      //   second--;
-      //   if (second) {
-      //   } else {
-      //     clearInterval(timer);
-      //     Toast.success('创建成功');
-      //     this.$eventHub.$emit('createCar', this.car);
-      //     this.$router.back(-1);
-      //   }
-      // }, 1000);
     },
 
-    getBalance() {
-      this.balances = this.customers;
+    getCustomers() {
       this.loading = false;
       this.finished = true;
     },
