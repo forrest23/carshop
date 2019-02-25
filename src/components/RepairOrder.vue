@@ -2,7 +2,7 @@
   <div class="container">
     <van-nav-bar class="title" title="维修接单" left-text="返回" left-arrow  @click-left="onClickLeft"/>
       <van-cell-group>
-             <van-row class="button-row">
+             <van-row>
   <van-col span="20"><van-field v-model="order.wtsh" required center readonly label="委托书号"/></van-col>
   <van-col span="2" class="button-col" ><van-icon name="plus" size="20px" @click="onCreateRepairOrder()"/></van-col>
   <van-col span="2" class="button-col" ><van-icon name="search" size="20px" @click="onShowRepairOrder()"/></van-col>
@@ -10,7 +10,7 @@
 </van-cell-group>
 
   <van-cell-group>
-             <van-row class="button-row">
+             <van-row>
   <van-col span="20"><van-field v-model="order.plate_num" required center clearable label="牌照号" :readonly= "isOldWts"
   placeholder="请输入或识别牌照号" :error-message="plateNumError" @blur="onBlurPlateNum"/></van-col>
   <van-col span="2" class="button-col" ><van-icon name="plus" size="20px" @click="onCreateCar()"/></van-col>
@@ -155,8 +155,6 @@ export default {
       showCarModel: false,
       minHour: 10,
       maxHour: 20,
-      minDate: new Date(2018, 0, 1),
-      maxDate: new Date(2019, 10, 1),
       currentDate: new Date(),
 
       plateNumError: '',
@@ -176,7 +174,6 @@ export default {
       result: [],
 
       active: 0,
-      cmpno: this.$route.query.cmpno,
       member: {},
       order: {
         wtsh: '',
@@ -218,7 +215,6 @@ export default {
     this.createWtsh();
     this.getPP();
     this.getXllx();
- 
   },
 
   methods: {
@@ -504,7 +500,7 @@ export default {
           path: '/memberBalance',
           name: 'MemberBalance',
           params: {
-            cmpno: this.cmpno,
+            cmpno: this.order.fcmpno,
             cardno: this.order.cardno,
           },
         });
@@ -696,7 +692,7 @@ export default {
 }
 
 .van-popup-size {
-  width: 98%;
+  width: 96%;
   height: 70%;
 }
 

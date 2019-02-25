@@ -2,12 +2,16 @@
   <div class="container">
     <van-nav-bar class="title" title="新建车辆" left-text="返回" left-arrow  @click-left="onClickLeft"/>
     <van-panel title="车辆信息" icon="logistics">
-            <van-row class="button-row">
+
+      <van-cell-group>
+            <van-row>
   <van-col span="22"><van-field v-model="car.plate_num" required center clearable label="牌照号" placeholder="请输入或识别牌照号" :error-message="plateNumError" @blur="onBlurPlateNum"/></van-col>
   <van-col span="2" class="button-col" ><van-uploader  :after-read="onReadVehicle" accept="image/jpg" >
              <van-icon name="scan" size="20px"/>
            </van-uploader></van-col>
 </van-row>
+</van-cell-group>
+
        <van-field v-model="car.vin" center clearable label="底盘号" placeholder="请输入底盘号">
        </van-field>
         <van-field v-model="car.engine_num" center clearable label="发动机号" placeholder="请输入发动机号">
@@ -20,20 +24,25 @@
     </van-panel>
 
     <van-panel title="客户信息" icon="contact">
-         <van-row class="button-row">
+      <van-cell-group>
+         <van-row>
   <van-col span="22"><van-field v-model="car.custname" required center label="客户名称" :error-message="custnameError"/></van-col>
   <van-col span="2" class="button-col" ><van-icon name="search" size="20px" @click="onShowCust()"/></van-col>
 </van-row>
+</van-cell-group>
 
-        <van-row class="button-row">
+ <van-cell-group>
+        <van-row>
   <van-col span="22"><van-field v-model="car.name" required center clearable label="联系人" placeholder="请输入联系人" :error-message="nameError"/></van-col>
   <van-col span="2" class="button-col" ><van-uploader  :after-read="onReadDriver" accept="image/jpg" >
              <van-icon name="scan" size="20px" />
            </van-uploader></van-col>
 </van-row>
+</van-cell-group>
+
        <van-field v-model="car.mobile" required center clearable label="联系电话" placeholder="请输入联系电话" :error-message="mobileError"/>  
 
-        <van-row class="button-row">
+        <van-row>
   <van-col span="22"><van-field v-model="car.num"  center clearable label="身份证号" placeholder="请输入身份证号"/></van-col>
   <van-col span="2" class="button-col" ><van-uploader  :after-read="onReadIdcard" accept="image/jpg" >
              <van-icon name="scan" size="20px" />
@@ -103,8 +112,6 @@ export default {
       showCust: false,
       showCarModel: false,
 
-      minDate: new Date(2018, 0, 1),
-      maxDate: new Date(2019, 10, 1),
       currentDate: new Date(),
 
       plateNumError: '',
