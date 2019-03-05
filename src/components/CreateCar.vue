@@ -88,7 +88,7 @@
     <van-col span="6"><van-cell :title="item.fkhh" /></van-col>
     <van-col span="10"><van-cell :title="item.fkhmc"  /></van-col>
     <van-col span="6"><van-cell :title="item.flxr"  /></van-col>
-    <van-col span="2"><van-checkbox v-model="item.checked" @change="onSelectCust(item)" /></van-col>
+    <van-col span="2"><van-checkbox v-model="item.isselect" @change="onSelectCust(item)" /></van-col>
    </van-row>
    </van-list>
    </van-popup>
@@ -360,6 +360,7 @@ export default {
       this.showCust = true;
     },
     onSelectCust(item) {
+      item.isselect = false;
       this.showCust = false;
       this.car.custno = item.fkhh;
       this.car.custname = item.fkhmc;
@@ -367,7 +368,6 @@ export default {
       this.car.num = item.fsfzh;
       this.car.address = item.fdz;
       this.car.mobile = item.fdh;
-      item.checked = false;
     },
     onCancelCust() {
       this.showCust = false;

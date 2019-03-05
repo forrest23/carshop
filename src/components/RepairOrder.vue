@@ -44,8 +44,8 @@
   </van-row>
 
   <van-row v-for="(item, index) in this.order.selectRepairItem" :key="index">
-    <van-col span="10"><van-field v-model="item.fxlnr" center/></van-col>
-    <van-col span="6"><van-field v-model="item.fxlgs" center type='number'/></van-col>
+    <van-col span="10"><van-field v-model="item.fxlnr" center /></van-col>
+    <van-col span="6"><van-field v-model="item.fxlgs" center type='number' @blur="onChangeXlgs(item)"/></van-col>
     <van-col span="6"><van-cell :title="item.fpggs" /></van-col>
     <van-col span="2">
       <van-cell class="vancell" @click="onRemoveRepairItem(index)" >
@@ -60,8 +60,6 @@
       v-model="currentDate"
       title="选择预计交车时间"
       type="datetime"
-      :min-date="minDate"
-      :max-date="maxDate"
       @confirm="onDateSelect"
       @cancel="onDateCancel"
      />
@@ -119,7 +117,7 @@
     <van-col span="5"><van-cell :title="item.fpzh"  /></van-col>
     <van-col span="5"><van-cell :title="item.fywjd"  /></van-col>
     <van-col span="5"><van-cell :title="item.fxllx"  /></van-col>
-    <van-col span="2"><van-checkbox v-model="item.checked" @change="onSelectWts(item)" /></van-col>
+    <van-col span="2"><van-checkbox v-model="item.isselect" @change="onSelectWts(item)" /></van-col>
    </van-row>
    </van-list>
    </van-popup>
@@ -452,6 +450,7 @@ export default {
       this.finishedwts = false;
     },
     onSelectWts(item) {
+      item.isselect = false;
       this.showRepairOrder = false;
       this.order.wtsh = item.fwtsh;
       this.order.plate_num = item.fpzh;
@@ -459,7 +458,6 @@ export default {
       this.order.mileage = item.fgls;
       this.order.price = item.fxlgsdj;
       this.order.carmodel = item.fcllx;
-      item.checked = false;
       this.isOldWts = true;
     },
 
@@ -470,10 +468,12 @@ export default {
       this.getWts();
     },
     onShowRepairOrder() {
-      this.getWts();
       this.showRepairOrder = true;
+      this.getWts();
     },
-
+    onChangeXlgs(item) {
+      item.fpggs= item.fxlgs * this.order.price;
+    },
     onCreateCar() {
       if (this.isOldWts) {
         Toast('已有委托书不能修改牌照号！');
@@ -537,10 +537,6 @@ export default {
         return;
       }
       this.mileageError = '';
-      if (this.order.selectRepairItem.length == 0) {
-        Toast.fail('请选择维修项目');
-        return;
-      }
 
       const toast = Toast.loading({
         duration: 0, // 持续展示 toast
