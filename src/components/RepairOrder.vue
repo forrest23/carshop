@@ -21,7 +21,6 @@
     </van-col>
 </van-row>
 </van-cell-group>
-
       <van-field v-model="order.carmodel" center readonly label="车型名称" @click="onCarModelSelect()" is-link arrow-direction="down"/> 
       <van-field v-model="order.cardno" center readonly label="会员卡号" @click="showMember()" is-link arrow-direction="right" />  
       <van-field v-model="order.custname"  center readonly label="客户名称"/>  
@@ -46,7 +45,7 @@
   <van-row v-for="(item, index) in this.order.selectRepairItem" :key="index">
     <van-col span="10"><van-field v-model="item.fxlnr" center /></van-col>
     <van-col span="6"><van-field v-model="item.fxlgs" center type='number' @blur="onChangeXlgs(item)"/></van-col>
-    <van-col span="6"><van-cell :title="item.fpggs" /></van-col>
+    <van-col span="6"><van-cell :title="item.fgsf" /></van-col>
     <van-col span="2">
       <van-cell class="vancell" @click="onRemoveRepairItem(index)" >
          <van-icon slot="right-icon" name="clear"  size="20px"/>
@@ -183,9 +182,12 @@ export default {
         mobile: '',
         repairType: '',
         mileage: '',
-        price: 1,
+        price: 0,
         completeTime: '',
         fywjd: '',
+        fkhh: '',
+        fdph: '',
+        ffdjh: '',
         selectRepairItem: [],
       },
 
@@ -222,6 +224,10 @@ export default {
       this.order.plate_num = car.plate_num;
       this.order.carmodel = car.carmodel;
       this.order.custname = car.custname;
+      this.order.price = car.price;
+      this.order.fkhh = car.custno;
+      this.order.fdph = car.vin;
+      this.order.ffdjh = car.engine_num;
     },
     createWtsh() {
       const params = {
@@ -234,7 +240,7 @@ export default {
           }
           if (response.data.success) {
             this.order.wtsh = response.data.data;
-            this.order.price = 1;
+            this.order.price = 0;
           } else {
             Toast(response.data.message);
           }
@@ -308,7 +314,7 @@ export default {
       );
     },
 
-     getPP() {
+    getPP() {
       const params = {
         id: 'GetAllCllx',
       };
@@ -337,6 +343,61 @@ export default {
       );
     },
 
+    getXlgsdj(pp, cxdl, cllx) {
+      const params = {
+        id: 'GetCllx',
+        pp,
+        cxdl,
+        cllx,
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取修理工时单价失败!请检查网络！');
+          }
+          if (response.data.success) {
+            if (response.data.data && response.data.data.length == 1) {
+              this.order.price = response.data.data[0].fxlgsdj;
+              this.order.selectRepairItem.forEach(ele => {
+                ele.fgsf = this.order.price * ele.fxlgs;
+              });
+            } else {
+              Toast('未找到该车型的工时单价信息!');
+            }
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取修理工时单价失败!请检查网络');
+        }
+      );
+    },
+
+    getWtsDetail(wtsh) {
+      const params = {
+        id: 'GetWtsDetail',
+        wtsh,
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取委托书明细失败!请检查网络！');
+          }
+          if (response.data.success) {
+            response.data.data.forEach(item => {
+              item.fgsf = this.order.price * item.fxlgs;
+              this.order.selectRepairItem.push(item);
+            });
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取委托书明细失败!请检查网络');
+        }
+      );
+    },
 
     onCarModelSelect() {
       this.showCarModel = true;
@@ -346,6 +407,8 @@ export default {
     },
     onCarModelConfirm(data) {
       this.order.carmodel = data[2].name;
+      this.getXlgsdj(data[0].name, data[1].name, data[2].name);
+
       this.showCarModel = false;
     },
 
@@ -368,6 +431,16 @@ export default {
                 this.order.name = response.data.data[0].flxr;
                 this.order.mobile = response.data.data[0].fmobile;
                 this.order.cardno = response.data.data[0].fcardno;
+
+                this.order.fkhh = response.data.data[0].fkhh;
+                this.order.fdph = response.data.data[0].fdph;
+                this.order.ffdjh = response.data.data[0].ffdjh;
+
+                this.getXlgsdj(
+                  response.data.data[0].fpp,
+                  response.data.data[0].fcxdl,
+                  response.data.data[0].fcllx
+                );
               } else {
                 Dialog.confirm({
                   message: '未找到该牌照号的车辆，是否新建？',
@@ -427,14 +500,19 @@ export default {
     },
 
     onSearchRepairItem() {
-        this.repairItems= this.repairItems.filter(p => p.fgwh.indexOf(this.searchRepairItemWord) > -1 || p.fxlnr.indexOf(this.searchRepairItemWord) > -1 );
+      this.repairItems = this.repairItems.filter(
+        p =>
+          p.fgwh.indexOf(this.searchRepairItemWord) > -1 ||
+          p.fxlnr.indexOf(this.searchRepairItemWord) > -1
+      );
     },
     onSearchRepairItemCancel() {
-       this.getXlxm();
+      this.getXlxm();
     },
     onSelectRepairItem(item, index) {
       this.showRepairItem = false;
       if (item.checked) {
+        item.fgsf = this.order.price * item.fxlgs;
         this.order.selectRepairItem.push(item);
         item.checked = false;
       }
@@ -450,19 +528,29 @@ export default {
       this.finishedwts = false;
     },
     onSelectWts(item) {
-      item.isselect = false;
-      this.showRepairOrder = false;
-      this.order.wtsh = item.fwtsh;
-      this.order.plate_num = item.fpzh;
-      this.order.repairType = item.fxllx;
-      this.order.mileage = item.fgls;
-      this.order.price = item.fxlgsdj;
-      this.order.carmodel = item.fcllx;
-      this.isOldWts = true;
+      if (item.isselect) {
+        this.showRepairOrder = false;
+        this.order.wtsh = item.fwtsh;
+        this.order.plate_num = item.fpzh;
+        this.order.repairType = item.fxllx;
+        this.order.mileage = item.fgls;
+        this.order.price = item.fxlgsdj;
+        this.order.carmodel = item.fcllx;
+        this.isOldWts = true;
+        this.order.completeTime = item.fjcrq;
+        this.order.selectRepairItem = [];
+        item.isselect = false;
+        this.onBlurPlateNum();
+        this.getWtsDetail(item.fwtsh);
+      }
     },
 
     onSearchRepairOrder() {
-      this.wts= this.wts.filter(p => p.fpzh.indexOf(this.searchRepairOrder) > -1 || p.fwtsh.indexOf(this.searchRepairOrder) > -1 );
+      this.wts = this.wts.filter(
+        p =>
+          p.fpzh.indexOf(this.searchRepairOrder) > -1 ||
+          p.fwtsh.indexOf(this.searchRepairOrder) > -1
+      );
     },
     onSearchRepairOrderCancel() {
       this.getWts();
@@ -472,7 +560,7 @@ export default {
       this.getWts();
     },
     onChangeXlgs(item) {
-      item.fpggs= item.fxlgs * this.order.price;
+      item.fgsf = item.fxlgs * this.order.price;
     },
     onCreateCar() {
       if (this.isOldWts) {
@@ -489,7 +577,7 @@ export default {
     },
 
     getRepairItems() {
-      this.getXlxm();   
+      this.getXlxm();
       this.repairItemsloading = false;
       this.repairItemsfinished = true;
     },
@@ -555,7 +643,7 @@ export default {
             }).then(() => {});
           }
           if (response.data.success) {
-            this.onCreateRepairOrder(); 
+            this.onCreateRepairOrder();
             Toast.success('委托书提交成功');
           } else {
             Toast.clear();

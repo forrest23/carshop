@@ -138,8 +138,9 @@ export default {
         address: '',
         mobile: '',
         carmodel: '',
+        custno:'',
         custname: '',
-        custname: '',
+        price: ''
       },
       customers: [],
 
@@ -252,6 +253,34 @@ export default {
         },
         response => {
           Toast('获取客户信息失败!请检查网络!');
+        }
+      );
+    },
+
+    getXlgsdj(pp,cxdl,cllx) {
+      const params = {
+        id: 'GetCllx',
+        pp,
+        cxdl,
+        cllx
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取修理工时单价失败!请检查网络！');
+          }
+          if (response.data.success) {
+            if (response.data.data && response.data.data.length ==1){
+              this.car.price = response.data.data[0].fxlgsdj;
+            }else {
+              Toast('未找到该车型的工时单价信息!');
+            }
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取修理工时单价失败!请检查网络');
         }
       );
     },
@@ -395,6 +424,7 @@ export default {
     },
     onCarModelConfirm(data) {
       this.car.carmodel = data[2].name;
+      this.getXlgsdj(data[0].name,data[1].name,data[2].name)
       this.showCarModel = false;
     },
 
