@@ -137,6 +137,8 @@ export default {
         num: '',
         address: '',
         mobile: '',
+        fpp:'',
+        fcxdl:'',
         carmodel: '',
         custno:'',
         custname: '',
@@ -423,6 +425,8 @@ export default {
       this.showCarModel = false;
     },
     onCarModelConfirm(data) {
+      this.car.fpp = data[0].name;
+      this.car.fcxdl = data[1].name;
       this.car.carmodel = data[2].name;
       this.getXlgsdj(data[0].name,data[1].name,data[2].name)
       this.showCarModel = false;

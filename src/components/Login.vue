@@ -68,7 +68,6 @@ export default {
           if (!response.ok) {
             Toast('登录失败!请检查网络！');
           }
-          console.log(response);
           if (response.data.success) {
             sessionStorage.setItem('companyno',response.data.companyNo);
             sessionStorage.setItem('companyname', this.companyname);

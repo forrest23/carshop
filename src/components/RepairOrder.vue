@@ -175,6 +175,8 @@ export default {
       order: {
         wtsh: '',
         plate_num: '',
+        fpp:'',
+        fcxdl:'',
         carmodel: '',
         cardno: '',
         custname: '',
@@ -223,6 +225,8 @@ export default {
       this.order.mobile = car.mobile;
       this.order.plate_num = car.plate_num;
       this.order.carmodel = car.carmodel;
+      this.order.fpp = car.fpp;
+      this.order.fcxdl = car.fcxdl;
       this.order.custname = car.custname;
       this.order.price = car.price;
       this.order.fkhh = car.custno;
@@ -239,6 +243,7 @@ export default {
             Toast('获取委托书号失败!请检查网络！');
           }
           if (response.data.success) {
+            this.isOldWts = false;
             this.order.wtsh = response.data.data;
             this.order.price = 0;
           } else {
@@ -406,6 +411,8 @@ export default {
       this.showCarModel = false;
     },
     onCarModelConfirm(data) {
+      this.order.fpp = data[0].name;
+      this.order.fcxdl = data[1].name;
       this.order.carmodel = data[2].name;
       this.getXlgsdj(data[0].name, data[1].name, data[2].name);
 
@@ -426,6 +433,8 @@ export default {
             if (response.data.success) {
               if (response.data.data.length > 0) {
                 this.order.plate_num = response.data.data[0].fpzh;
+                this.order.fcxdl = response.data.data[0].fcxdl;
+                this.order.fpp = response.data.data[0].fpp;
                 this.order.carmodel = response.data.data[0].fcllx;
                 this.order.custname = response.data.data[0].fkhmc;
                 this.order.name = response.data.data[0].flxr;
@@ -602,9 +611,7 @@ export default {
       }
       this.order.selectRepairItem = [];
       this.createWtsh();
-      this.order.fywjd = sessionStorage.getItem('username') || '';
-      this.order.fcmpno = sessionStorage.getItem('companyno') || '';
-      this.order.fcmpname = localStorage.getItem('companyname') || '';
+     
     },
 
     onSubmit() {
@@ -632,6 +639,10 @@ export default {
         loadingType: 'spinner',
         message: '正在提交数据',
       });
+
+      this.order.fywjd = sessionStorage.getItem('username') || '';
+      this.order.fcmpno = sessionStorage.getItem('companyno') || '';
+      this.order.fcmpname = localStorage.getItem('companyname') || '';
 
       api.SaveWts(this.order).then(
         response => {
