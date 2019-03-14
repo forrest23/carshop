@@ -196,7 +196,19 @@ export default {
             }
             if (response.data.success) {
               if (response.data.data.length > 0) {
-                Toast('该车辆信息已经存在！');
+                this.car.vin = response.data.data[0].fdph;
+                this.car.engine_num = response.data.data[0].ffdjh;
+                this.car.fpp = response.data.data[0].fpp;
+                this.car.fcxdl = response.data.data[0].fcxdl;
+                this.car.carmodel = response.data.data[0].fcllx;
+                this.car.register_date = response.data.data[0].flzrq;
+                this.car.num = response.data.data[0].fsfzh;
+                this.car.custno = response.data.data[0].fkhh;
+                this.car.custname = response.data.data[0].fkhmc;
+                this.car.name = response.data.data[0].flxr;
+                this.car.mobile = response.data.data[0].fmobile;
+                this.car.address = response.data.data[0].flxdz;
+                this.getXlgsdj(this.car.fpp,this.car.fcxdl,this.car.carmodel)
               }
             } else {
               Toast(response.data.message);

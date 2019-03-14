@@ -209,10 +209,6 @@ export default {
   },
 
   mounted: function() {
-    this.openid = this.$cookies.get('openid');
-    this.order.fywjd = sessionStorage.getItem('username') || '';
-    this.order.fcmpno = sessionStorage.getItem('companyno') || '';
-    this.order.fcmpname = localStorage.getItem('companyname') || '';
     this.order.fno = new Date().getTime();
     this.createWtsh();
     this.getPP();
@@ -279,6 +275,7 @@ export default {
       const params = {
         id: 'GetWts',
         wtsh: '',
+        ywjd: sessionStorage.getItem('username') || ''
       };
       api.getWts(params).then(
         response => {
@@ -481,6 +478,7 @@ export default {
       }
       this.createWtsh();
       this.order.selectRepairItem = [];
+      this.order.fno = new Date().getTime();
       this.$router.back(-1);
     },
     onShowRepairType() {
@@ -597,7 +595,7 @@ export default {
           path: '/memberBalance',
           name: 'MemberBalance',
           params: {
-            cmpno: this.order.fcmpno,
+            cmpno: sessionStorage.getItem('companyno') || '',
             cardno: this.order.cardno,
           },
         });
@@ -610,8 +608,8 @@ export default {
         this.order[key] = '';
       }
       this.order.selectRepairItem = [];
+      this.order.fno = new Date().getTime();
       this.createWtsh();
-     
     },
 
     onSubmit() {
@@ -721,7 +719,7 @@ export default {
         success(result) {
           const formData = new FormData();
           formData.append(
-            type + '|' + that.order.fno + '|' + that.order.fcmpno,
+            type + '|' + that.order.fno + '|' + sessionStorage.getItem('companyno') || '',
             result,
             imageFile.filename
           );
