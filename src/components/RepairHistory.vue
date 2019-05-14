@@ -80,6 +80,7 @@ export default {
         path: '/repairHistoryDetail',
         name: 'RepairHistoryDetail',
         params: {
+          type: '已结算',
           fjsdjh: fjsdjh,
         },
       });

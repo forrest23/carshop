@@ -9,7 +9,7 @@
    >
    <van-row class="vanrow" v-for="(item, index) in statistics" :key="index">
     <van-row class="vanChildRow">
-      <van-col span="14"><span class="label">委托书号：</span><span @click="showStatisticsDetail(item.ffzjgno)">{{item.fwtsh}}</span></van-col>
+      <van-col span="14"><span class="label">委托书号：</span><span @click="showHistoryDetail(item.fwtsh)">{{item.fwtsh}}</span></van-col>
       <van-col span="10"><span class="label">牌照号：</span><span>{{item.fpzh }}</span></van-col>
     </van-row>
 
@@ -41,15 +41,10 @@ export default {
       finishedHistory: false,
     };
   },
-  mounted: function() {
-  },
+  mounted: function() {},
   methods: {
     onClickLeft() {
       this.$router.back(-1);
-    },
-    onGetHistory() {
-      this.loadingHistory = false;
-      this.finishedHistory = false;
     },
     getRepairCarStatisticsDetail() {
       const params = {
@@ -73,6 +68,16 @@ export default {
           Toast('获取在修车统计明细失败!请检查网络!');
         }
       );
+    },
+    showHistoryDetail(fwtsh) {
+      this.$router.push({
+        path: '/repairHistoryDetail',
+        name: 'RepairHistoryDetail',
+        params: {
+          type: '未结算',
+          fwtsh: fwtsh,
+        },
+      });
     },
   },
 };
@@ -105,11 +110,11 @@ h2 {
   border-bottom-style: solid;
   margin-bottom: 6px;
 }
-.vanChildRow{
+.vanChildRow {
   text-align: left;
   padding-bottom: 3px;
 }
-.label{
+.label {
   color: #969799;
 }
 </style>

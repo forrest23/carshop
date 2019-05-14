@@ -9,15 +9,15 @@
    >
    <van-row class="vanrow" v-for="(item, index) in history" :key="index">
     <van-row class="vanChildRow">
-      <van-col span="14"><span class="label">项目代码：</span><span>{{item.fgwh}}</span></van-col>
+      <van-col span="24"><span class="label">项目代码：</span><span>{{item.fgwh}}</span></van-col>
     </van-row>
 
     <van-row class="vanChildRow">
-      <van-col span="14"><span class="label">项目名称：</span><span>{{item.fxlnr}}</span></van-col>
+      <van-col span="24"><span class="label">项目名称：</span><span>{{item.fxlnr}}</span></van-col>
     </van-row>
 
       <van-row class="vanChildRow">
-        <van-col span="10"><span class="label">项目数量：</span><span>{{item.fsl}}</span></van-col>
+        <van-col span="24"><span class="label">项目数量：</span><span>{{item.fsl}}</span></van-col>
     </van-row>
    </van-row>
    </van-list>
@@ -32,14 +32,13 @@ export default {
   name: 'RepairHistoryDetail',
   data() {
     return {
+      type: this.$route.params.type,
       fjsdjh: this.$route.params.fjsdjh,
+      fwtsh: this.$route.params.fwtsh,
       history: [],
       loadingHistory: false,
       finishedHistory: false,
     };
-  },
-  mounted: function() {
-    this.getRepairHistory();
   },
   methods: {
     onClickLeft() {
@@ -50,10 +49,18 @@ export default {
       this.finishedHistory = false;
     },
     getRepairHistory() {
-      const params = {
-        id: 'GetRepairHistoryDetail',
-        strJsdjh: this.fjsdjh,
-      };
+      var params = {};
+      if (this.type == '已结算') {
+        params = {
+          id: 'GetRepairHistoryDetail',
+          strJsdjh: this.fjsdjh,
+        }
+      } else {
+        params = {
+          id: 'GetRepairDetailWtsh',
+          strWtsh: this.fwtsh,
+        }
+      }
       api.getWts(params).then(
         response => {
           if (!response.ok) {
@@ -103,11 +110,11 @@ h2 {
   border-bottom-style: solid;
   margin-bottom: 6px;
 }
-.vanChildRow{
+.vanChildRow {
   text-align: left;
   padding-bottom: 3px;
 }
-.label{
+.label {
   color: #969799;
 }
 </style>

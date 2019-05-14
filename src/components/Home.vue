@@ -12,7 +12,7 @@
            <span>维修接单</span>
           </van-col>
             <van-col span="6">
-           <van-icon name="records" size="48px" color="#2894FF" @click="onRouterTo('在修车查询')"/>
+           <van-icon name="logistics" size="48px" color="#2894FF" @click="onRouterTo('在修车查询')"/>
            <span>在修车查询</span>
           </van-col>
          <van-col span="6"></van-col>

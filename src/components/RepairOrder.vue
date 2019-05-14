@@ -19,7 +19,7 @@
         <van-icon name="scan" size="20px" />
     </van-uploader>
   </van-col>
-  <van-col span="2" class="button-col" ><van-icon name="plus" size="20px" @click="showRepairHistory()"/></van-col>
+  <van-col span="2" class="button-col" ><van-icon name="more-o" size="20px" @click="showRepairHistory()"/></van-col>
 </van-row>
 </van-cell-group>
       <van-field v-model="order.carmodel" center readonly label="车型名称" @click="onCarModelSelect()" is-link arrow-direction="down"/> 

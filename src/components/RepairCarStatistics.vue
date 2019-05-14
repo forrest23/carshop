@@ -9,15 +9,15 @@
    >
    <van-row class="vanrow" v-for="(item, index) in statistics" :key="index">
     <van-row class="vanChildRow">
-      <van-col span="14"><span class="label">公司编号：</span><span @click="showStatisticsDetail(item.ffzjgno)">{{item.ffzjgno}}</span></van-col>
+      <van-col span="24"><span class="label">公司编号：</span><span @click="showStatisticsDetail(item.ffzjgno)">{{item.ffzjgno}}</span></van-col>
     </van-row>
 
     <van-row class="vanChildRow">
-      <van-col span="14"><span class="label">公司名称：</span><span>{{item.fgsmc}}</span></van-col>
+      <van-col span="24"><span class="label">公司名称：</span><span>{{item.fgsmc}}</span></van-col>
     </van-row>
 
       <van-row class="vanChildRow">
-        <van-col span="10"><span class="label">数量：</span><span>{{item.fcount}}</span></van-col>
+        <van-col span="24"><span class="label">数量：</span><span>{{item.fcount}}</span></van-col>
     </van-row>
    </van-row>
    </van-list>
