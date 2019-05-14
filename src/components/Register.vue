@@ -59,7 +59,6 @@ export default {
   },
   mounted: function() {
     this.openid = this.$cookies.get('openid');
-    //this.openid = '1111';
     this.cmpno = this.$route.query.cmpno;
   },
   methods: {

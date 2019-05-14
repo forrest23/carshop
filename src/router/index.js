@@ -9,6 +9,10 @@ import MemberItem from '@/components/MemberItem'
 import RepairOrder from '@/components/RepairOrder'
 import CreateCar from '@/components/CreateCar'
 import MemberBalance from '@/components/MemberBalance'
+import RepairHistory from '@/components/RepairHistory'
+import RepairHistoryDetail from '@/components/RepairHistoryDetail'
+import RepairCarStatistics from '@/components/RepairCarStatistics'
+import RepairCarStatisticsDetail from '@/components/RepairCarStatisticsDetail'
 
 import { Toast } from 'vant'
 
@@ -80,6 +84,34 @@ const router = new Router({
       path: '/memberBalance',
       name: 'MemberBalance',
       component: MemberBalance,
+      meta: {
+        check: true
+      }
+    }, {
+      path: '/repairHistory',
+      name: 'RepairHistory',
+      component: RepairHistory,
+      meta: {
+        check: true
+      }
+    }, {
+      path: '/repairHistoryDetail',
+      name: 'RepairHistoryDetail',
+      component: RepairHistoryDetail,
+      meta: {
+        check: true
+      }
+    }, {
+      path: '/repairCarStatistics',
+      name: 'RepairCarStatistics',
+      component: RepairCarStatistics,
+      meta: {
+        check: true
+      }
+    }, {
+      path: '/repairCarStatisticsDetail',
+      name: 'RepairCarStatisticsDetail',
+      component: RepairCarStatisticsDetail,
       meta: {
         check: true
       }

@@ -11,14 +11,15 @@
 
   <van-cell-group>
              <van-row>
-  <van-col span="20"><van-field v-model="order.plate_num" required center clearable label="牌照号" :readonly= "isOldWts"
+  <van-col span="18"><van-field v-model="order.plate_num" required center clearable label="牌照号" :readonly= "isOldWts"
   placeholder="请输入或识别牌照号" :error-message="plateNumError" @blur="onBlurPlateNum"/></van-col>
   <van-col span="2" class="button-col" ><van-icon name="plus" size="20px" @click="onCreateCar()"/></van-col>
   <van-col span="2" class="button-col" >
     <van-uploader :after-read="onReadVehiclePlate" accept="image/jpg" >
-             <van-icon name="scan" size="20px" />
-           </van-uploader>
-    </van-col>
+        <van-icon name="scan" size="20px" />
+    </van-uploader>
+  </van-col>
+  <van-col span="2" class="button-col" ><van-icon name="plus" size="20px" @click="showRepairHistory()"/></van-col>
 </van-row>
 </van-cell-group>
       <van-field v-model="order.carmodel" center readonly label="车型名称" @click="onCarModelSelect()" is-link arrow-direction="down"/> 
@@ -175,8 +176,8 @@ export default {
       order: {
         wtsh: '',
         plate_num: '',
-        fpp:'',
-        fcxdl:'',
+        fpp: '',
+        fcxdl: '',
         carmodel: '',
         cardno: '',
         custname: '',
@@ -275,7 +276,7 @@ export default {
       const params = {
         id: 'GetWts',
         wtsh: '',
-        ywjd: sessionStorage.getItem('username') || ''
+        ywjd: sessionStorage.getItem('username') || '',
       };
       api.getWts(params).then(
         response => {
@@ -583,6 +584,20 @@ export default {
       });
     },
 
+    showRepairHistory(){
+      if (!this.order.plate_num) {
+        Toast('牌照号为空，无法查询维修历史！');
+        return;
+      }
+      this.$router.push({
+        path: '/repairHistory',
+        name: 'RepairHistory',
+        params: {
+          plate_num: this.order.plate_num,
+        },
+      });
+    },
+
     getRepairItems() {
       this.getXlxm();
       this.repairItemsloading = false;
@@ -719,7 +734,11 @@ export default {
         success(result) {
           const formData = new FormData();
           formData.append(
-            type + '|' + that.order.fno + '|' + sessionStorage.getItem('companyno') || '',
+            type +
+              '|' +
+              that.order.fno +
+              '|' +
+              sessionStorage.getItem('companyno') || '',
             result,
             imageFile.filename
           );

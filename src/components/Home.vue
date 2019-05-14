@@ -11,6 +11,10 @@
            <van-icon name="records" size="48px" color="#2894FF" @click="onRouterTo('维修接单')"/>
            <span>维修接单</span>
           </van-col>
+            <van-col span="6">
+           <van-icon name="records" size="48px" color="#2894FF" @click="onRouterTo('在修车查询')"/>
+           <span>在修车查询</span>
+          </van-col>
          <van-col span="6"></van-col>
        </van-row>
     </div>
@@ -42,6 +46,9 @@ export default {
           break;
         case "维修接单":
           this.$router.push('/RepairOrder');
+          break;
+        case "在修车查询":
+          this.$router.push('/RepairCarStatistics');
           break;
         default:
           break;
