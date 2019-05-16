@@ -28,9 +28,16 @@
       <van-field v-model="order.name"  center readonly label="联系人"/>  
       <van-field v-model="order.mobile"  center readonly label="联系电话"/>  
       <van-field v-model="order.repairType" required center readonly label="修理类型" :error-message="repairTypeError" @click="onShowRepairType()" is-link arrow-direction="down"/>  
-       <van-field v-model="order.mileage" required center clearable label="公里数" :error-message="mileageError" placeholder="请输入公里数"></van-field>
-       <van-field v-model="order.price" center readonly label="工时单价"/>  
-       <van-field v-model="order.completeTime" center readonly label="预计交车" @click="onShowDateSelect()" is-link arrow-direction="down"/>  
+      <van-field v-model="order.mileage" required center clearable label="公里数" :error-message="mileageError" placeholder="请输入公里数"></van-field>
+      <van-field v-model="order.price" center readonly label="工时单价"/>  
+      <van-field v-model="order.completeTime" center readonly label="预计交车" @click="onShowDateSelect()" is-link arrow-direction="down"/>  
+
+      <van-field v-model="order.fbxgsmc" required center readonly label="保险公司" :error-message="repairTypeError" @click="onShowBxgs()" is-link arrow-direction="down"/>  
+      <van-field v-model="order.fbxdqsj" center readonly label="商业到期" @click="onfbxdqsjShow('商业')" is-link arrow-direction="down"/> 
+      <van-field v-model="order.fjqzzrq" center readonly label="交强到期" @click="onfbxdqsjShow('交强')" is-link arrow-direction="down"/> 
+      <van-field v-model="order.flzrq" center readonly label="购车日期" @click="onfbxdqsjShow('购车')" is-link arrow-direction="down"/>
+      <van-field v-model="order.fnjdqrq" center readonly label="年检到期" @click="onfbxdqsjShow('年检')" is-link arrow-direction="down"/> 
+      <van-field v-model="order.fjzdq" center readonly label="驾照到期" @click="onfbxdqsjShow('驾照')" is-link arrow-direction="down"/>
 
         <van-cell title="维修项目" @click="onShowRepairItem()" >
          <van-icon slot="right-icon" name="search"  size="20px"/>
@@ -62,6 +69,57 @@
       type="datetime"
       @confirm="onDateSelect"
       @cancel="onDateCancel"
+     />
+    </van-popup>
+
+    <van-popup v-model="showfbxdqsj" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择商业到期"
+      type="date"
+      @confirm="onfbxdqsjSelect('商业')"
+      @cancel="onfbxdqsjCancel('商业')"
+     />
+    </van-popup>
+
+     <van-popup v-model="showfjqzzrq" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择交强到期"
+      type="date"
+      @confirm="onfbxdqsjSelect('交强')"
+      @cancel="onfbxdqsjCancel('交强')"
+     />
+    </van-popup>
+
+    <van-popup v-model="showflzrq" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择购车到期"
+      type="date"
+      @confirm="onfbxdqsjSelect('购车')"
+      @cancel="onfbxdqsjCancel('购车')"
+     />
+    </van-popup>
+
+    <van-popup v-model="showfnjdqrq" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择年检到期"
+      type="date"
+      @confirm="onfbxdqsjSelect('年检')"
+      @cancel="onfbxdqsjCancel('年检')"
+     />
+    </van-popup>
+
+
+    <van-popup v-model="showfjzdq" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择驾照到期"
+      type="date"
+      @confirm="onfbxdqsjSelect('驾照')"
+      @cancel="onfbxdqsjCancel('驾照')"
      />
     </van-popup>
 
@@ -130,6 +188,14 @@
      @cancel="onCancelRepairType"
     />
 
+    <van-actionsheet
+     v-model="showBxgs"
+     :actions="bxgs"
+     cancel-text="取消"
+     @select="onSelectBxgs"
+     @cancel="onCancelBxgs"
+    />
+
     <van-popup v-model="showCarModel" position="center" :overlay="true" class="van-popup-size">
     <van-area :area-list="areaList" @confirm="onCarModelConfirm" @cancel="onCarModelCancel"/>
    </van-popup>
@@ -147,10 +213,17 @@ export default {
     return {
       isOldWts: false,
       show: false,
+      showfbxdqsj: false,
+      showfjqzzrq: false,
+      showflzrq: false,
+      showfnjdqrq: false,
+      showfjzdq: false,
+
       showRepairItem: false,
       showRepairOrder: false,
       ShowRepairType: false,
       showCarModel: false,
+      showBxgs: false,
       minHour: 10,
       maxHour: 20,
       currentDate: new Date(),
@@ -161,6 +234,7 @@ export default {
 
       repairItems: [],
       repairTypes: [],
+      bxgs: [],
 
       searchRepairItemWord: '',
       searchRepairOrder: '',
@@ -170,6 +244,7 @@ export default {
       loadingwts: false,
       finishedwts: false,
       result: [],
+      fzjgno:'',
 
       active: 0,
       member: {},
@@ -191,6 +266,12 @@ export default {
         fkhh: '',
         fdph: '',
         ffdjh: '',
+        fbxgsmc: '',
+        fbxdqsj: '',
+        fjqzzrq: '',
+        flzrq: '',
+        fnjdqrq: '',
+        fjzdq: '',
         selectRepairItem: [],
       },
 
@@ -214,6 +295,8 @@ export default {
     this.createWtsh();
     this.getPP();
     this.getXllx();
+    this.getBxgs();
+    this.getFzjgno();
   },
 
   methods: {
@@ -229,6 +312,12 @@ export default {
       this.order.fkhh = car.custno;
       this.order.fdph = car.vin;
       this.order.ffdjh = car.engine_num;
+      this.order.fbxgsmc = car.fbxgsmc;
+      this.order.fbxdqsj = car.fbxdqsj;
+      this.order.fjqzzrq = car.fjqzzrq;
+      this.order.flzrq = car.register_date;
+      this.order.fnjdqrq = car.fnjdqrq;
+      this.order.fjzdq = car.fjzdq;
     },
     createWtsh() {
       const params = {
@@ -272,11 +361,32 @@ export default {
         }
       );
     },
+    getBxgs() {
+      const params = {
+        id: 'GetBxgs',
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取保险公司失败!请检查网络！');
+          }
+          if (response.data.success) {
+            this.bxgs = response.data.data;
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取保险公司失败!请检查网络');
+        }
+      );
+    },
     getWts() {
       const params = {
         id: 'GetWts',
         wtsh: '',
         ywjd: sessionStorage.getItem('username') || '',
+        fzjgno: this.fzjgno
       };
       api.getWts(params).then(
         response => {
@@ -313,6 +423,28 @@ export default {
         },
         response => {
           Toast('获取修理项目失败!请检查网络');
+        }
+      );
+    },
+
+    getFzjgno() {
+      const params = {
+        id: 'getFzjgno',
+        fywjd: sessionStorage.getItem('username') || '',
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取员工分支机构编号失败!请检查网络！');
+          }
+          if (response.data.success) {
+            this.fzjgno = response.data.data;
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取员工分支机构编号失败!请检查网络');
         }
       );
     },
@@ -443,6 +575,13 @@ export default {
                 this.order.fdph = response.data.data[0].fdph;
                 this.order.ffdjh = response.data.data[0].ffdjh;
 
+                this.order.fbxgsmc = response.data.data[0].fbxgsmc;
+                this.order.flzrq = response.data.data[0].flzrq;
+                this.order.fbxdqsj = response.data.data[0].fbxdqsj;
+                this.order.fjqzzrq = response.data.data[0].fjqzzrq;
+                this.order.fnjdqrq = response.data.data[0].fnjdqrq;
+                this.order.fjzdq = response.data.data[0].fjzdq;
+
                 this.getXlgsdj(
                   response.data.data[0].fpp,
                   response.data.data[0].fcxdl,
@@ -493,6 +632,17 @@ export default {
       this.ShowRepairType = false;
     },
 
+    onShowBxgs() {
+      this.showBxgs = true;
+    },
+    onSelectBxgs(item) {
+      this.order.fbxgsmc = item.name;
+      this.showBxgs = false;
+    },
+    onCancelBxgs() {
+      this.showBxgs = false;
+    },
+
     onDateSelect() {
       this.show = false;
       this.order.completeTime = this.dateFtt(
@@ -505,6 +655,76 @@ export default {
     },
     onShowDateSelect() {
       this.show = true;
+    },
+
+    onfbxdqsjSelect(type) {
+      var selectDate = this.dateFtt('yyyy-MM-dd', this.currentDate);
+      switch (type) {
+        case '商业':
+          this.order.fbxdqsj = selectDate;
+          this.showfbxdqsj = false;
+          break;
+        case '交强':
+          this.order.fjqzzrq = selectDate;
+           this.showfjqzzrq = false;
+          break;
+        case '购车':
+          this.order.flzrq = selectDate;
+           this.showflzrq = false;
+          break;
+        case '年检':
+          this.order.fnjdqrq = selectDate;
+           this.showfnjdqrq = false;
+          break;
+        case '驾照':
+          this.order.fjzdq = selectDate;
+           this.showfjzdq = false;
+          break;
+        default:
+          break;
+      }
+    },
+    onfbxdqsjCancel(type) {
+      switch (type) {
+        case '商业':
+          this.showfbxdqsj = false;
+          break;
+        case '交强':
+          this.showfjqzzrq = false;
+          break;
+        case '购车':
+          this.showflzrq = false;
+          break;
+        case '年检':
+          this.showfnjdqrq = false;
+          break;
+        case '驾照':
+          this.showfjzdq = false;
+          break;
+        default:
+          break;
+      }
+    },
+    onfbxdqsjShow(type) {
+     switch (type) {
+        case '商业':
+          this.showfbxdqsj = true;
+          break;
+        case '交强':
+          this.showfjqzzrq = true;
+          break;
+        case '购车':
+          this.showflzrq = true;
+          break;
+        case '年检':
+          this.showfnjdqrq = true;
+          break;
+        case '驾照':
+          this.showfjzdq = true;
+          break;
+        default:
+          break;
+      }
     },
 
     onSearchRepairItem() {
@@ -584,7 +804,7 @@ export default {
       });
     },
 
-    showRepairHistory(){
+    showRepairHistory() {
       if (!this.order.plate_num) {
         Toast('牌照号为空，无法查询维修历史！');
         return;

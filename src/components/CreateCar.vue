@@ -19,7 +19,12 @@
 
        <van-field v-model="car.carmodel" center readonly label="车型名称" @click="onCarModelSelect()" is-link arrow-direction="down"/> 
 
-     <van-field v-model="car.register_date" center readonly label="领证日期" @click="onShowDateSelect()" is-link arrow-direction="down"/> 
+      <van-field v-model="car.fbxgsmc" required center readonly label="保险公司" @click="onShowBxgs()" is-link arrow-direction="down"/>  
+      <van-field v-model="car.fbxdqsj" center readonly label="商业到期" @click="onfbxdqsjShow('商业')" is-link arrow-direction="down"/> 
+      <van-field v-model="car.fjqzzrq" center readonly label="交强到期" @click="onfbxdqsjShow('交强')" is-link arrow-direction="down"/> 
+      <van-field v-model="car.register_date" center readonly label="领证日期" @click="onShowDateSelect()" is-link arrow-direction="down"/> 
+      <van-field v-model="car.fnjdqrq" center readonly label="年检到期" @click="onfbxdqsjShow('年检')" is-link arrow-direction="down"/> 
+      <van-field v-model="car.fjzdq" center readonly label="驾照到期" @click="onfbxdqsjShow('驾照')" is-link arrow-direction="down"/>
 
     </van-panel>
 
@@ -64,6 +69,65 @@
       @cancel="onDateCancel"
      />
     </van-popup>
+
+     <van-popup v-model="showfbxdqsj" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择商业到期"
+      type="date"
+      @confirm="onfbxdqsjSelect('商业')"
+      @cancel="onfbxdqsjCancel('商业')"
+     />
+    </van-popup>
+
+     <van-popup v-model="showfjqzzrq" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择交强到期"
+      type="date"
+      @confirm="onfbxdqsjSelect('交强')"
+      @cancel="onfbxdqsjCancel('交强')"
+     />
+    </van-popup>
+
+    <van-popup v-model="showflzrq" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择购车到期"
+      type="date"
+      @confirm="onfbxdqsjSelect('购车')"
+      @cancel="onfbxdqsjCancel('购车')"
+     />
+    </van-popup>
+
+    <van-popup v-model="showfnjdqrq" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择年检到期"
+      type="date"
+      @confirm="onfbxdqsjSelect('年检')"
+      @cancel="onfbxdqsjCancel('年检')"
+     />
+    </van-popup>
+
+
+    <van-popup v-model="showfjzdq" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择驾照到期"
+      type="date"
+      @confirm="onfbxdqsjSelect('驾照')"
+      @cancel="onfbxdqsjCancel('驾照')"
+     />
+    </van-popup>
+
+    <van-actionsheet
+     v-model="showBxgs"
+     :actions="bxgs"
+     cancel-text="取消"
+     @select="onSelectBxgs"
+     @cancel="onCancelBxgs"
+    />
 
    <van-popup v-model="showCust" position="center" :overlay="true" class="van-popup-size">
     <van-search v-model="searchCustWord"
@@ -111,6 +175,12 @@ export default {
       showDate: false,
       showCust: false,
       showCarModel: false,
+      showBxgs: false,
+      showfbxdqsj: false,
+      showfjqzzrq: false,
+      showflzrq: false,
+      showfnjdqrq: false,
+      showfjzdq: false,
 
       currentDate: new Date(),
 
@@ -123,6 +193,7 @@ export default {
       loading: false,
       finished: false,
       result: [],
+      bxgs: [],
 
       active: 0,
       member: {},
@@ -137,12 +208,18 @@ export default {
         num: '',
         address: '',
         mobile: '',
-        fpp:'',
-        fcxdl:'',
+        fpp: '',
+        fcxdl: '',
         carmodel: '',
-        custno:'',
+        custno: '',
         custname: '',
-        price: ''
+        price: '',
+        fbxgsmc: '',
+        fbxdqsj: '',
+        fjqzzrq: '',
+        flzrq: '',
+        fnjdqrq: '',
+        fjzdq: '',
       },
       customers: [],
 
@@ -165,6 +242,7 @@ export default {
     this.car.plate_num = this.$route.params.plate_num;
     this.car.fno = new Date().getTime();
     this.getPP();
+    this.getBxgs();
   },
   computed: {
     columns() {
@@ -208,7 +286,12 @@ export default {
                 this.car.name = response.data.data[0].flxr;
                 this.car.mobile = response.data.data[0].fmobile;
                 this.car.address = response.data.data[0].flxdz;
-                this.getXlgsdj(this.car.fpp,this.car.fcxdl,this.car.carmodel)
+                this.car.fbxgsmc = response.data.data[0].fbxgsmc;
+                this.car.fbxdqsj = response.data.data[0].fbxdqsj;
+                this.car.fjqzzrq = response.data.data[0].fjqzzrq;
+                this.car.fnjdqrq = response.data.data[0].fnjdqrq;
+                this.car.fjzdq = response.data.data[0].fjzdq;
+                this.getXlgsdj(this.car.fpp, this.car.fcxdl, this.car.carmodel);
               }
             } else {
               Toast(response.data.message);
@@ -250,6 +333,27 @@ export default {
       );
     },
 
+    getBxgs() {
+      const params = {
+        id: 'GetBxgs',
+      };
+      api.getWts(params).then(
+        response => {
+          if (!response.ok) {
+            Toast('获取保险公司失败!请检查网络！');
+          }
+          if (response.data.success) {
+            this.bxgs = response.data.data;
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('获取保险公司失败!请检查网络');
+        }
+      );
+    },
+
     getKh() {
       const params = {
         id: 'GetKh',
@@ -271,12 +375,12 @@ export default {
       );
     },
 
-    getXlgsdj(pp,cxdl,cllx) {
+    getXlgsdj(pp, cxdl, cllx) {
       const params = {
         id: 'GetCllx',
         pp,
         cxdl,
-        cllx
+        cllx,
       };
       api.getWts(params).then(
         response => {
@@ -284,9 +388,9 @@ export default {
             Toast('获取修理工时单价失败!请检查网络！');
           }
           if (response.data.success) {
-            if (response.data.data && response.data.data.length ==1){
+            if (response.data.data && response.data.data.length == 1) {
               this.car.price = response.data.data[0].fxlgsdj;
-            }else {
+            } else {
               Toast('未找到该车型的工时单价信息!');
             }
           } else {
@@ -301,6 +405,87 @@ export default {
 
     onClickLeft() {
       this.$router.back(-1);
+    },
+
+    onfbxdqsjSelect(type) {
+      var selectDate = this.dateFtt('yyyy-MM-dd', this.currentDate);
+      switch (type) {
+        case '商业':
+          this.car.fbxdqsj = selectDate;
+          this.showfbxdqsj = false;
+          break;
+        case '交强':
+          this.car.fjqzzrq = selectDate;
+           this.showfjqzzrq = false;
+          break;
+        case '购车':
+          this.car.flzrq = selectDate;
+          this.showflzrq = false;
+          break;
+        case '年检':
+          this.car.fnjdqrq = selectDate;
+          this.showfnjdqrq = false;
+          break;
+        case '驾照':
+          this.car.fjzdq = selectDate;
+           this.showfjzdq = false;
+          break;
+        default:
+          break;
+      }
+    },
+    onfbxdqsjCancel(type) {
+      switch (type) {
+        case '商业':
+          this.showfbxdqsj = false;
+          break;
+        case '交强':
+          this.showfjqzzrq = false;
+          break;
+        case '购车':
+          this.showflzrq = false;
+          break;
+        case '年检':
+          this.showfnjdqrq = false;
+          break;
+        case '驾照':
+          this.showfjzdq = false;
+          break;
+        default:
+          break;
+      }
+    },
+    onfbxdqsjShow(type) {
+     switch (type) {
+        case '商业':
+          this.showfbxdqsj = true;
+          break;
+        case '交强':
+          this.showfjqzzrq = true;
+          break;
+        case '购车':
+          this.showflzrq = true;
+          break;
+        case '年检':
+          this.showfnjdqrq = true;
+          break;
+        case '驾照':
+          this.showfjzdq = true;
+          break;
+        default:
+          break;
+      }
+    },
+
+    onShowBxgs() {
+      this.showBxgs = true;
+    },
+    onSelectBxgs(item) {
+      this.car.fbxgsmc = item.name;
+      this.showBxgs = false;
+    },
+    onCancelBxgs() {
+      this.showBxgs = false;
     },
 
     onReadDriver(file) {
@@ -416,7 +601,11 @@ export default {
       this.showCust = false;
     },
     onSearchCust() {
-      this.customers= this.customers.filter(p => p.fkhmc.indexOf(this.searchCustWord) > -1 || p.flxr.indexOf(this.searchCustWord) > -1 );
+      this.customers = this.customers.filter(
+        p =>
+          p.fkhmc.indexOf(this.searchCustWord) > -1 ||
+          p.flxr.indexOf(this.searchCustWord) > -1
+      );
     },
     onSearchCustCancel() {
       this.getKh();
@@ -440,7 +629,7 @@ export default {
       this.car.fpp = data[0].name;
       this.car.fcxdl = data[1].name;
       this.car.carmodel = data[2].name;
-      this.getXlgsdj(data[0].name,data[1].name,data[2].name)
+      this.getXlgsdj(data[0].name, data[1].name, data[2].name);
       this.showCarModel = false;
     },
 
