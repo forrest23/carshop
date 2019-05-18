@@ -19,7 +19,7 @@
 
        <van-field v-model="car.carmodel" center readonly label="车型名称" @click="onCarModelSelect()" is-link arrow-direction="down"/> 
 
-      <van-field v-model="car.fbxgsmc" required center readonly label="保险公司" @click="onShowBxgs()" is-link arrow-direction="down"/>  
+      <van-field v-model="car.fbxgsmc" center readonly label="保险公司" @click="onShowBxgs()" is-link arrow-direction="down"/>  
       <van-field v-model="car.fbxdqsj" center readonly label="商业到期" @click="onfbxdqsjShow('商业')" is-link arrow-direction="down"/> 
       <van-field v-model="car.fjqzzrq" center readonly label="交强到期" @click="onfbxdqsjShow('交强')" is-link arrow-direction="down"/> 
       <van-field v-model="car.register_date" center readonly label="领证日期" @click="onShowDateSelect()" is-link arrow-direction="down"/> 

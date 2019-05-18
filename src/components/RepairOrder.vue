@@ -11,7 +11,7 @@
 
   <van-cell-group>
              <van-row>
-  <van-col span="18"><van-field v-model="order.plate_num" required center clearable label="牌照号" :readonly= "isOldWts"
+  <van-col span="18"><van-field v-model="order.plate_num" required center clearable label="牌照号" :readonly= "order.isOldWts"
   placeholder="请输入或识别牌照号" :error-message="plateNumError" @blur="onBlurPlateNum"/></van-col>
   <van-col span="2" class="button-col" ><van-icon name="plus" size="20px" @click="onCreateCar()"/></van-col>
   <van-col span="2" class="button-col" >
@@ -29,10 +29,10 @@
       <van-field v-model="order.mobile"  center readonly label="联系电话"/>  
       <van-field v-model="order.repairType" required center readonly label="修理类型" :error-message="repairTypeError" @click="onShowRepairType()" is-link arrow-direction="down"/>  
       <van-field v-model="order.mileage" required center clearable label="公里数" :error-message="mileageError" placeholder="请输入公里数"></van-field>
-      <van-field v-model="order.price" center readonly label="工时单价"/>  
+      <van-field v-model="order.price" required center readonly label="工时单价" :error-message="priceError"/>  
       <van-field v-model="order.completeTime" center readonly label="预计交车" @click="onShowDateSelect()" is-link arrow-direction="down"/>  
 
-      <van-field v-model="order.fbxgsmc" required center readonly label="保险公司" :error-message="repairTypeError" @click="onShowBxgs()" is-link arrow-direction="down"/>  
+      <van-field v-model="order.fbxgsmc" center readonly label="保险公司"  @click="onShowBxgs()" is-link arrow-direction="down"/>  
       <van-field v-model="order.fbxdqsj" center readonly label="商业到期" @click="onfbxdqsjShow('商业')" is-link arrow-direction="down"/> 
       <van-field v-model="order.fjqzzrq" center readonly label="交强到期" @click="onfbxdqsjShow('交强')" is-link arrow-direction="down"/> 
       <van-field v-model="order.flzrq" center readonly label="购车日期" @click="onfbxdqsjShow('购车')" is-link arrow-direction="down"/>
@@ -211,7 +211,6 @@ export default {
   name: 'RepairOrder',
   data() {
     return {
-      isOldWts: false,
       show: false,
       showfbxdqsj: false,
       showfjqzzrq: false,
@@ -231,6 +230,7 @@ export default {
       plateNumError: '',
       repairTypeError: '',
       mileageError: '',
+      priceError:'',
 
       repairItems: [],
       repairTypes: [],
@@ -250,6 +250,7 @@ export default {
       member: {},
       order: {
         wtsh: '',
+        isOldWts: false,
         plate_num: '',
         fpp: '',
         fcxdl: '',
@@ -329,7 +330,7 @@ export default {
             Toast('获取委托书号失败!请检查网络！');
           }
           if (response.data.success) {
-            this.isOldWts = false;
+            this.order.isOldWts = false;
             this.order.wtsh = response.data.data;
             this.order.price = 0;
           } else {
@@ -764,7 +765,7 @@ export default {
         this.order.mileage = item.fgls;
         this.order.price = item.fxlgsdj;
         this.order.carmodel = item.fcllx;
-        this.isOldWts = true;
+        this.order.isOldWts = true;
         this.order.completeTime = item.fjcrq;
         this.order.selectRepairItem = [];
         item.isselect = false;
@@ -791,7 +792,7 @@ export default {
       item.fgsf = item.fxlgs * this.order.price;
     },
     onCreateCar() {
-      if (this.isOldWts) {
+      if (this.order.isOldWts) {
         Toast('已有委托书不能修改牌照号！');
         return;
       }
@@ -838,7 +839,7 @@ export default {
     },
 
     onCreateRepairOrder() {
-      this.isOldWts = false;
+      this.order.isOldWts = false;
       for (var key in this.order) {
         this.order[key] = '';
       }
@@ -865,6 +866,12 @@ export default {
         return;
       }
       this.mileageError = '';
+
+      if (this.order.price === ''){
+        this.priceError = '工时单价不能为空';
+        return;
+      }
+      this.priceError = '';
 
       const toast = Toast.loading({
         duration: 0, // 持续展示 toast
@@ -934,7 +941,7 @@ export default {
     },
 
     onReadVehiclePlate(file) {
-      if (this.isOldWts) {
+      if (this.order.isOldWts) {
         Toast('已有委托书不能修改牌照号！');
         return;
       }
