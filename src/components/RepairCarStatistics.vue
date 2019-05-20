@@ -9,7 +9,7 @@
    >
    <van-row class="vanrow" v-for="(item, index) in statistics" :key="index">
     <van-row class="vanChildRow">
-      <van-col span="24"><span class="label">公司编号：</span><span @click="showStatisticsDetail(item.ffzjgno)">{{item.ffzjgno}}</span></van-col>
+      <van-col span="24"><span class="label">公司编号：</span><span class="clicklabel" @click="showStatisticsDetail(item.ffzjgno)">{{item.ffzjgno}}</span></van-col>
     </van-row>
 
     <van-row class="vanChildRow">
@@ -39,7 +39,6 @@ export default {
     };
   },
   mounted: function() {
-    this.getRepairHistory();
   },
   methods: {
     onClickLeft() {
@@ -76,7 +75,7 @@ export default {
       this.$router.push({
         path: '/repairCarStatisticsDetail',
         name: 'RepairCarStatisticsDetail',
-        params: {
+        query: {
           ffzjgno: ffzjgno,
         },
       });
@@ -118,5 +117,8 @@ h2 {
 }
 .label{
   color: #969799;
+}
+.clicklabel{
+  color:#1989fa;
 }
 </style>

@@ -32,13 +32,20 @@ export default {
   name: 'RepairHistoryDetail',
   data() {
     return {
-      type: this.$route.params.type,
-      fjsdjh: this.$route.params.fjsdjh,
-      fwtsh: this.$route.params.fwtsh,
+      type: '',
+      fjsdjh: '',
+      fwtsh: '',
       history: [],
       loadingHistory: false,
       finishedHistory: false,
     };
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.type = to.query.type;
+      vm.fjsdjh = to.query.fjsdjh;
+      vm.fwtsh = to.query.fwtsh;
+    });
   },
   methods: {
     onClickLeft() {

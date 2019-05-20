@@ -9,7 +9,7 @@
    >
    <van-row class="vanrow" v-for="(item, index) in history" :key="index" >
     <van-row class="vanChildRow" >
-      <van-col span="14"><span class="label" >结算单号：</span><span @click="showHistoryDetail(item.fjsdjh)">{{item.fjsdjh}}</span></van-col>
+      <van-col span="14"><span class="label" >结算单号：</span><span class="clicklabel" @click="showHistoryDetail(item.fjsdjh)">{{item.fjsdjh}}</span></van-col>
       <van-col span="10"><span class="label">日期：</span><span>{{item.fxlrq}}</span></van-col>
     </van-row>
 
@@ -35,14 +35,18 @@ export default {
   name: 'RepairHistory',
   data() {
     return {
-      plate_num: this.$route.params.plate_num,
+      plate_num: '',
       history: [],
       loadingHistory: false,
       finishedHistory: false,
     };
   },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.plate_num = to.query.plate_num;
+    });
+  },
   mounted: function() {
-    this.getRepairHistory();
   },
   methods: {
     onClickLeft() {
@@ -79,7 +83,7 @@ export default {
       this.$router.push({
         path: '/repairHistoryDetail',
         name: 'RepairHistoryDetail',
-        params: {
+        query: {
           type: '已结算',
           fjsdjh: fjsdjh,
         },
@@ -122,5 +126,8 @@ h2 {
 }
 .label {
   color: #969799;
+}
+.clicklabel{
+  color:#1989fa;
 }
 </style>

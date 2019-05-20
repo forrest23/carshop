@@ -9,7 +9,7 @@
    >
    <van-row class="vanrow" v-for="(item, index) in statistics" :key="index">
     <van-row class="vanChildRow">
-      <van-col span="14"><span class="label">委托书号：</span><span @click="showHistoryDetail(item.fwtsh)">{{item.fwtsh}}</span></van-col>
+      <van-col span="14"><span class="label">委托书号：</span><span class="clicklabel" @click="showHistoryDetail(item.fwtsh)">{{item.fwtsh}}</span></van-col>
       <van-col span="10"><span class="label">牌照号：</span><span>{{item.fpzh }}</span></van-col>
     </van-row>
 
@@ -35,11 +35,16 @@ export default {
   name: 'RepairCarStatistics',
   data() {
     return {
-      ffzjgno: this.$route.params.ffzjgno,
+      ffzjgno: '',
       statistics: [],
       loadingHistory: false,
       finishedHistory: false,
     };
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.ffzjgno = to.query.ffzjgno;
+    });
   },
   mounted: function() {},
   methods: {
@@ -73,7 +78,7 @@ export default {
       this.$router.push({
         path: '/repairHistoryDetail',
         name: 'RepairHistoryDetail',
-        params: {
+        query: {
           type: '未结算',
           fwtsh: fwtsh,
         },
@@ -116,5 +121,8 @@ h2 {
 }
 .label {
   color: #969799;
+}
+.clicklabel{
+  color:#1989fa;
 }
 </style>

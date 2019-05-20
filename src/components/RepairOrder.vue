@@ -813,7 +813,7 @@ export default {
       this.$router.push({
         path: '/repairHistory',
         name: 'RepairHistory',
-        params: {
+        query: {
           plate_num: this.order.plate_num,
         },
       });
