@@ -15,7 +15,10 @@
            <van-icon name="logistics" size="48px" color="#2894FF" @click="onRouterTo('在修车查询')"/>
            <span>在修车查询</span>
           </van-col>
-         <van-col span="6"></van-col>
+            <van-col span="6">
+           <van-icon name="user-o" size="48px" color="#2894FF" @click="onRouterTo('会员识别')"/>
+           <span>会员识别</span>
+          </van-col>
        </van-row>
     </div>
     <van-tabbar v-model="active">
@@ -49,6 +52,9 @@ export default {
           break;
         case "在修车查询":
           this.$router.push('/RepairCarStatistics');
+          break;
+        case "会员识别":
+          this.$router.push('/MemberScan');
           break;
         default:
           break;
