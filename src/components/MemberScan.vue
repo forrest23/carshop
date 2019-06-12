@@ -136,6 +136,8 @@ export default {
                 this.car.fjzdq = response.data.data[0].fjzdq;
                 this.car.fcardno = response.data.data[0].fcardno;
                 this.getMember();
+              } else{
+                Toast("未找到该牌照号的会员信息！");
               }
             } else {
               Toast(response.data.message);
