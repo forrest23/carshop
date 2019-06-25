@@ -6,7 +6,7 @@
       <van-cell-group>
             <van-row>
   <van-col span="22"><van-field v-model="car.plate_num" required center clearable label="牌照号" placeholder="请输入或识别牌照号" :error-message="plateNumError" @blur="onBlurPlateNum"/></van-col>
-  <van-col span="2" class="button-col" ><van-uploader  :after-read="onReadVehicle" accept="image/jpg" >
+  <van-col span="2" class="button-col" ><van-uploader  :after-read="onReadVehiclePlate" accept="image/jpg" >
              <van-icon name="scan" size="20px"/>
            </van-uploader></van-col>
 </van-row>
@@ -84,7 +84,6 @@ export default {
     this.car.fname = sessionStorage.getItem('username') || '';
     this.car.fcmpno = sessionStorage.getItem('companyno') || '';
     this.car.fcmpname = localStorage.getItem('companyname') || '';
-    this.car.plate_num = this.$route.params.plate_num;
     this.car.fno = new Date().getTime();
   },
   computed: {
@@ -135,7 +134,9 @@ export default {
                 this.car.fnjdqrq = response.data.data[0].fnjdqrq;
                 this.car.fjzdq = response.data.data[0].fjzdq;
                 this.car.fcardno = response.data.data[0].fcardno;
-                this.getMember();
+                if (this.car.fcardno !=""){
+                   this.getMember();
+                }
               } else{
                 Toast("未找到该牌照号的会员信息！");
               }
@@ -178,16 +179,8 @@ export default {
       this.$router.back(-1);
     },
 
-    onReadDriver(file) {
-      this.uploadFile(file, 'driver|face');
-    },
-
-    onReadVehicle(file) {
-      this.uploadFile(file, 'vehicle|face');
-    },
-
-    onReadIdcard(file) {
-      this.uploadFile(file, 'idcard|face');
+    onReadVehiclePlate(file) {
+      this.uploadFile(file, 'vehiclePlate|face');
     },
 
     uploadFile(file, type) {
@@ -251,6 +244,10 @@ export default {
       console.log(response.bodyText);
       var result = JSON.parse(response.bodyText);
       switch (type) {
+        case 'vehiclePlate|face':
+          this.car.plate_num = result.plates[0].txt;
+          this.onBlurPlateNum()
+          break;
         case 'vehicle|face':
           this.car.plate_num = result.plate_num;
           this.car.vin = result.vin;

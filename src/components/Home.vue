@@ -20,6 +20,12 @@
            <span>会员识别</span>
           </van-col>
        </van-row>
+       <van-row type="flex" justify="space-around">
+         <van-col span="6">
+           <van-icon name="photograph" size="48px" color="#2894FF" @click="onRouterTo('定义问卷')"/>
+           <span>定义问卷</span>
+          </van-col>
+       </van-row>
     </div>
     <van-tabbar v-model="active">
       <van-tabbar-item icon="wap-home">主页</van-tabbar-item>
@@ -55,6 +61,9 @@ export default {
           break;
         case "会员识别":
           this.$router.push('/MemberScan');
+          break;
+        case "定义问卷":
+          this.$router.push('/QuestionnaireEdit');
           break;
         default:
           break;
