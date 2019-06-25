@@ -6,7 +6,7 @@ import router from './router'
 import VueCookies from 'vue-cookies'
 import { Button, Field, Actionsheet, Picker, Popup, NavBar, Row, Col,
   Icon, Tabbar, TabbarItem, Uploader, Cell, CellGroup, Panel, Tab,
-  Tabs, DatetimePicker, Search, List, Checkbox, CheckboxGroup, Area, Switch } from 'vant'
+  Tabs, DatetimePicker, Search, List, Checkbox, CheckboxGroup, Area, Switch, SwitchCell } from 'vant'
 
 Vue.use(Button)
 Vue.use(Field)
@@ -27,6 +27,7 @@ Vue.use(List)
 Vue.use(Checkbox).use(CheckboxGroup)
 Vue.use(Area)
 Vue.use(Switch)
+Vue.use(SwitchCell)
 
 Vue.use(VueCookies)
 

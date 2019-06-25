@@ -30,124 +30,62 @@
       </van-row>
     </questionList> -->
 
-    <!-- addRadio -->
+    <!-- 单选题 -->
     <van-popup v-model="addRadio_modal" class="van-popup-size">
-      <!-- form表单-->
       <van-cell-group ref="addRadio" v-model="addRadio_form" >
         <van-field v-model="addRadio_form.question" center clearable label="题目" placeholder="问请输入题目"/>
         <van-field v-model="addRadio_form.description" center clearable label="题目说明" placeholder="请输入题目说明，可以为空"/>
-
-          <van-cell-group class="option-item" v-for="(option, index) in addRadio_form.options" v-bind:key="index">
-            <van-row>
-              <van-col span="18">
-                <van-field v-model="option.content"  placeholder="请输入选项内容"/>
-              </van-col>
-              <van-col span="6">
-                <van-row>
-                   <van-col>
-                      <van-button type="success" icon="add-o" size="small"
-                        @click="addOption(addRadio_form.options)"></van-button>
-                   </van-col>
-
-                <van-col>
-                <van-button type="warning" icon="close" size="small"
-                        @click="delOption(addRadio_form.options,index)"></van-button>
-                        </van-col>
-                </van-row>
-              </van-col>
-
-            </van-row>
-            <div class="option-addtion">
-              是否有附加说明内容：
-              <van-switch v-model="option.isAddition">
-              </van-switch>
-            </div>
-        </van-cell-group>
-        <van-cell-group>
-            是否必填：
-            <van-switch v-model="addRadio_form.isRequired">
-            </van-switch>
-        </van-cell-group>
-      </van-cell-group>
-      <div slot="footer">
+         <van-row v-for="(option, index) in addRadio_form.options" v-bind:key="index">
+           <van-field v-model="option.content" center clearable label="选项"  placeholder="请输入选项内容">
+           <van-button slot="button" type="primary" icon="add-o" size="small"
+                        @click="addOption(addRadio_form.options)">增加</van-button>
+            <van-button slot="button" class="btn-left" type="danger" icon="add-o" size="small"
+                        @click="delOption(addRadio_form.options,index)">删除</van-button>
+            </van-field>
+            <van-switch-cell v-model="option.isAddition" title="是否有附加说明内容：" />
+         </van-row>
+         <van-switch-cell v-model="addRadio_form.isRequired" title="是否必填" />
+     </van-cell-group>
+     <van-row class="add-button" type="flex" justify="center" align="middle">
         <van-button type="primary" :loading="addRadio_loading" @click="submitRadio('addRadio')">提交</van-button>
         <van-button @click="closeRadioModal">关闭</van-button>
-      </div>
+     </van-row>
     </van-popup>
-    <!-- addCheckbox -->
-    <van-popup v-model="addCheckbox_modal">
-      <!-- form表单-->
-      <Form ref="addCheckbox" :model="addCheckbox_form" :label-width="80" class="form">
-        <Form-item label="题目" prop="title">
-          <Input v-model="addCheckbox_form.question" placeholder="请输入题目内容"></Input>
-        </Form-item>
-        <Form-item label="题目说明" prop="description">
-          <Input v-model="addCheckbox_form.description" placeholder="请输入题目说明，可以为空"></Input>
-        </Form-item>
-        <Form-item label="选项" prop="title">
-          <div class="option-item" v-for="(option, index) in addCheckbox_form.options" v-bind:key="index">
-            <van-row>
-              <van-col span="18">
-              <Input v-model="option.content" :key="index" placeholder="请输入选项内容"
-                     style="display:inline-block"></Input></van-col>
-              <van-col span="6">
-              <div class="option-btn">
-                <van-button type="success" icon="plus-round" size="small"
-                        @click="addOption(addCheckbox_form.options)"></van-button>
-                <van-button type="warning" icon="close" size="small"
-                        @click="delOption(addCheckbox_form.options,index)"></van-button>
-              </div>
 
-              </van-col>
-            </van-row>
-            <div class="option-addtion">
-              是否有附加说明内容：
-              <van-switch v-model="option.isAddition" disabled>
-                <span slot="open">有</span>
-                <span slot="close">无</span>
-              </van-switch>
-            </div>
-          </div>
-        </Form-item>
-        <Form-item label="必填项">
-          <div class="option-addtion">
-            <van-switch v-model="addCheckbox_form.isRequired">
-              <span slot="open">是</span>
-              <span slot="close">否</span>
-            </van-switch>
-          </div>
-        </Form-item>
-      </Form>
-      <div slot="footer">
+    <!-- 多选题 -->
+    <van-popup v-model="addCheckbox_modal" class="van-popup-size">
+      <van-cell-group ref="addCheckbox" v-model="addCheckbox_form">
+        <van-field v-model="addCheckbox_form.question" center clearable label="题目" placeholder="请输入题目内容"/>
+        <van-field v-model="addCheckbox_form.description" center clearable label="题目" placeholder="请输入题目说明，可以为空"/>
+         <van-row v-for="(option, index) in addCheckbox_form.options" v-bind:key="index">
+           <van-field v-model="option.content" center clearable label="选项"  placeholder="请输入选项内容">
+           <van-button slot="button" type="primary" icon="add-o" size="small"
+                        @click="addOption(addCheckbox_form.options)">增加</van-button>
+            <van-button slot="button" class="btn-left" type="danger" icon="add-o" size="small"
+                        @click="delOption(addCheckbox_form.options,index)">删除</van-button>
+            </van-field>
+            <van-switch-cell v-model="option.isAddition" title="是否有附加说明内容：" />
+         </van-row>
+         <van-switch-cell v-model="addCheckbox_form.isRequired" title="是否必填" />
+      </van-cell-group>
+      <van-row class="add-button" type="flex" justify="center" align="middle">
         <van-button type="primary" :loading="addCheckbox_loading" @click="submitCheckbox('addCheckbox')">提交</van-button>
         <van-button @click="closeCheckboxModal">关闭</van-button>
-      </div>
-    </van-popup>
-    <!-- addTextarea -->
-    <van-popup v-model="addTextarea_modal">
-      <!-- form表单-->
-      <Form ref="addTextarea" :model="addTextarea_form" :label-width="80" class="form">
-        <Form-item label="题目" prop="title">
-          <Input v-model="addTextarea_form.question" placeholder="请输入题目内容"></Input>
-        </Form-item>
-        <Form-item label="题目说明" prop="description">
-          <Input v-model="addTextarea_form.description" placeholder="请输入题目说明，可以为空"></Input>
-        </Form-item>
-        <Form-item label="必填项">
-          <div class="option-addtion">
-            <van-switch v-model="addTextarea_form.isRequired">
-              <span slot="open">是</span>
-              <span slot="close">否</span>
-            </van-switch>
-          </div>
-        </Form-item>
-      </Form>
-      <div slot="footer">
-        <van-button type="primary" :loading="addTextarea_loading" @click="submitTextarea('addTextarea')">提交</van-button>
-        <van-button @click="closeTextareaModal">关闭</van-button>
-      </div>
+     </van-row>
     </van-popup>
 
+    <!-- 文本题 -->
+    <van-popup v-model="addTextarea_modal" class="van-popup-size">
+      <van-cell-group ref="addTextarea" v-model="addTextarea_form">
+        <van-field v-model="addTextarea_form.question"  center clearable label="题目" placeholder="请输入题目内容"/>
+        <van-field v-model="addTextarea_form.description"  center clearable label="题目说明" placeholder="请输入题目说明，可以为空"/>
+        <van-switch-cell v-model="addTextarea_form.isRequired" title="是否必填" />
+      </van-cell-group>
+      <van-row class="add-button" type="flex" justify="center" align="middle">
+        <van-button type="primary" :loading="addTextarea_loading" @click="submitTextarea('addTextarea')">提交</van-button>
+        <van-button @click="closeTextareaModal">关闭</van-button>
+     </van-row>
+    </van-popup>
   </div>
 </template>
 
@@ -442,7 +380,11 @@ export default {
 }
 
 .add-button button {
-  margin: 0 10px;
+  margin: 10px;
+}
+
+.btn-left{
+  margin-left: 6px;
 }
 
 .van-popup-size {
