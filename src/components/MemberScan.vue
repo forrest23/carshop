@@ -17,7 +17,7 @@
        <van-cell :value="car.fcxdl" title="车系" />
        <van-cell :value="car.fcllx" title="车型名称" />
        <van-cell :value="member.classname" title="会员级别" />
-       <van-cell :value="car.fcardno" title="会员卡号" />
+       <van-cell :value="car.fcardno" title="会员卡号" @click="showMember()" is-link/>
        <van-cell :value="car.fbxgsmc" title="保险公司" />
        <van-cell :value="car.fbxdqsj" title="商业到期" />
        <van-cell :value="car.fjqzzrq" title="交强到期" />
@@ -154,7 +154,7 @@ export default {
     getMember() {
       const params = {
         id: 'GetMemberByCardno',
-        cmpno: this.car.fcmpno,
+        cmpno: sessionStorage.getItem('companyno') || '',
         cardno: this.car.fcardno,
       };
       api.getMember(params).then(
@@ -175,7 +175,24 @@ export default {
       );
     },
 
+      showMember() {
+      if (this.car.fcardno) {
+        this.$router.push({
+          path: '/memberBalance',
+          name: 'MemberBalance',
+          params: {
+            cmpno: sessionStorage.getItem('companyno') || '',
+            cardno: this.car.fcardno,
+          },
+        });
+      }
+    },
+
     onClickLeft() {
+      for (var key in this.car) {
+        this.car[key] = '';
+      }
+      this.member.classname ='';
       this.$router.back(-1);
     },
 

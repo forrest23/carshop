@@ -14,6 +14,7 @@ import RepairHistoryDetail from '@/components/RepairHistoryDetail'
 import RepairCarStatistics from '@/components/RepairCarStatistics'
 import RepairCarStatisticsDetail from '@/components/RepairCarStatisticsDetail'
 import QuestionnaireEdit from '@/components/questionnaire/edit'
+import QuestionnaireView from '@/components/questionnaire/view'
 import MemberScan from '@/components/MemberScan'
 
 import { Toast } from 'vant'
@@ -122,12 +123,20 @@ const router = new Router({
       name: 'MemberScan',
       component: MemberScan,
       meta: {
-        check: true
+        check: true,
+        isKeepAlive: true
       }
     }, {
       path: '/questionnaireEdit',
       name: 'QuestionnaireEdit',
       component: QuestionnaireEdit,
+      meta: {
+        check: true
+      }
+    }, {
+      path: '/questionnaireView',
+      name: 'QuestionnaireView',
+      component: QuestionnaireView,
       meta: {
         check: true
       }

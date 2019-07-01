@@ -25,6 +25,9 @@
            <van-icon name="photograph" size="48px" color="#2894FF" @click="onRouterTo('定义问卷')"/>
            <span>定义问卷</span>
           </van-col>
+          <van-col span="6"/>
+          <van-col span="6"/>
+          <van-col span="6"/>
        </van-row>
     </div>
     <van-tabbar v-model="active">

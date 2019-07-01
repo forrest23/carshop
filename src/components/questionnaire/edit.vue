@@ -3,8 +3,8 @@
     <van-row>
       <van-col span="24">
       <van-cell-group>
-        <van-field v-model="title" center clearable label="问卷名" placeholder="请输入问卷名"/>
-        <van-field v-model="textarea" center clearable label="问卷介绍" placeholder="请输入问卷介绍"/>
+        <van-field v-model="naire.title" center clearable label="问卷名" placeholder="请输入问卷名"/>
+        <van-field v-model="naire.intro" center clearable label="问卷介绍" placeholder="请输入问卷介绍"/>
       </van-cell-group>
       </van-col>
     </van-row>
@@ -13,22 +13,6 @@
       <van-button type="primary" @click="addCheckbox">多选题</van-button>
       <van-button type="primary" @click="addTextarea">文本题</van-button>
     </van-row>
-
-    <!-- <questionList :question-list="naire.topic" :is-preview="true">
-      <van-row>
-        <van-col span="4" style="margin-right: 10px;">
-        <Date-picker type="datetime" placeholder="截止日期"
-                     v-model="deadline"
-                     :editable="false" placement="right-end"
-                     :options="dateOption">
-        </Date-picker>
-        </van-col>
-        <van-col span="12">
-        <van-button style="margin-right: 10px;" @click="handleSave">保存问卷</van-button>
-        <van-button type="success" @click="handlePublish">发布问卷</van-button>
-        </van-col>
-      </van-row>
-    </questionList> -->
 
     <!-- 单选题 -->
     <van-popup v-model="addRadio_modal" class="van-popup-size">
@@ -86,15 +70,46 @@
         <van-button @click="closeTextareaModal">关闭</van-button>
      </van-row>
     </van-popup>
+
+     <questionList :question-list="naire.topic" :is-preview="true">
+       <van-row>
+          <van-field readonly label="截止日期" v-model="naire.deadline" @click="onShowDeadline()" placeholder="请选择截止时间"/>  
+      </van-row>
+      <van-row type="flex" justify="center">
+        <van-button style="margin-right: 10px;" @click="handleSave">保存问卷</van-button>
+        <van-button type="success" @click="handlePublish">发布问卷</van-button>
+      </van-row>
+    </questionList>
+
+      <van-popup v-model="showDate" position="bottom" :overlay="true">
+     <van-datetime-picker
+      v-model="currentDate"
+      title="选择截止日期"
+      type="datetime"
+      @confirm="onDateSelect"
+      @cancel="onDateCancel"
+     />
+    </van-popup>
   </div>
 </template>
 
 <script>
 import questionList from '@/components/questionnaire/questionList';
+import { Toast, Dialog } from 'vant';
 
 export default {
   data() {
     return {
+      currentDate: new Date(),
+      naire: {
+        title: '',
+        deadline: '',
+        intro: '',
+        status: 0,
+        topic: [],
+      },
+      showDate: false,
+      deadline: '',
       addRadio_modal: false,
       addRadio_loading: false,
       addRadio_form: {},
@@ -112,34 +127,7 @@ export default {
       textarea: '',
     };
   },
-  computed: {
-    naire() {
-      return 'naire';
-    },
-    title: {
-      get() {
-        return '';
-      },
-    },
-    // intro: {
-    //   get () {
-    //     this.textarea = this.$store.getters.naire.intro
-    //     return this.$store.getters.intro
-    //   },
-    //   set (value) {
-    //     this.$store.commit('UPDATE_INTRO', value)
-    //   }
-    // },
-    deadline: {
-      get() {
-        return '2018-09-10';
-      },
-      set(value) {
-        console.log(value);
-        this.$store.commit('UPDATE_DEADLINE', new Date(value).getTime());
-      },
-    },
-  },
+  computed: {},
   created() {
     // 如果id存在，则从服务器获取数据，并展示
     // this.fetchData()
@@ -183,34 +171,33 @@ export default {
     },
     validNaire() {
       let isPassed = true;
-      if (this.title === '') {
-        this.warning(false, '问卷标题', '请输入问卷标题');
-        this.$refs.title.focus();
+      if (this.naire.title === '') {
+        Toast('请输入问卷标题');
         isPassed = false;
       }
-      if (this.deadline === '' || !this.deadline) {
-        this.warning(false, '截止时间', '请选择问卷截止时间');
+      if (this.naire.deadline === '' || !this.naire.deadline) {
+        Toast('请选择问卷截止时间');
         isPassed = false;
       }
       if (this.naire.topic.length < 1) {
-        this.warning(false, '问卷题目', '请至少添加一道问卷题目');
+        Toast('请至少添加一道问卷题目');
         isPassed = false;
       }
       return isPassed;
     },
-    // 用于问卷介绍的 v-model 双向数据绑定
-    updateIntro(e) {
-      this.$store.commit('UPDATE_INTRO', e.target.value);
-    },
     handleSave() {
       if (this.validNaire()) {
-        this.$store.dispatch('changeNaireStatus', 0);
-        this.saveNaire('保存失败，请重试');
+        this.$router.push({
+          path: '/QuestionnaireView',
+          name: 'QuestionnaireView',
+          query: {
+            naire: this.naire,
+          },
+        });
       }
     },
     handlePublish() {
       if (this.validNaire()) {
-        this.$store.dispatch('changeNaireStatus', 1);
         this.saveNaire('发布失败，请重试');
       }
     },
@@ -289,14 +276,14 @@ export default {
     submitRadio(name) {
       if (this.validQuestion(this.addRadio_form)) {
         const data = Object.assign({}, this.addRadio_form);
-        this.$store.dispatch('addQuestion', data);
+        this.naire.topic.push(data);
         this.addRadio_modal = false;
       }
     },
     submitCheckbox(name) {
       if (this.validQuestion(this.addCheckbox_form)) {
         const data = Object.assign({}, this.addCheckbox_form);
-        this.$store.dispatch('addQuestion', data);
+        this.naire.topic.push(data);
         this.addCheckbox_modal = false;
       }
     },
@@ -306,7 +293,7 @@ export default {
         return;
       }
       const data = Object.assign({}, this.addTextarea_form);
-      this.$store.dispatch('addQuestion', data);
+      this.naire.topic.push(data);
       this.addTextarea_modal = false;
     },
     // 关闭弹框
@@ -358,6 +345,41 @@ export default {
           this.$Message.error(message);
         });
     },
+    onDateSelect() {
+      this.showDate = false;
+      this.naire.deadline = this.dateFtt('yyyy-MM-dd hh:mm', this.currentDate);
+    },
+    onDateCancel() {
+      this.showDate = false;
+    },
+    onShowDeadline() {
+      this.showDate = true;
+    },
+    dateFtt(fmt, date) {
+      var o = {
+        'M+': date.getMonth() + 1, //月份
+        'd+': date.getDate(), //日
+        'h+': date.getHours(), //小时
+        'm+': date.getMinutes(), //分
+        's+': date.getSeconds(), //秒
+        'q+': Math.floor((date.getMonth() + 3) / 3), //季度
+        S: date.getMilliseconds(), //毫秒
+      };
+      if (/(y+)/.test(fmt))
+        fmt = fmt.replace(
+          RegExp.$1,
+          (date.getFullYear() + '').substr(4 - RegExp.$1.length)
+        );
+      for (var k in o)
+        if (new RegExp('(' + k + ')').test(fmt))
+          fmt = fmt.replace(
+            RegExp.$1,
+            RegExp.$1.length == 1
+              ? o[k]
+              : ('00' + o[k]).substr(('' + o[k]).length)
+          );
+      return fmt;
+    },
   },
   components: {
     questionList,
@@ -383,7 +405,7 @@ export default {
   margin: 10px;
 }
 
-.btn-left{
+.btn-left {
   margin-left: 6px;
 }
 
