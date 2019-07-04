@@ -40,7 +40,7 @@
     <van-popup v-model="addCheckbox_modal" class="van-popup-size">
       <van-cell-group ref="addCheckbox" v-model="addCheckbox_form">
         <van-field v-model="addCheckbox_form.question" center clearable label="题目" placeholder="请输入题目内容"/>
-        <van-field v-model="addCheckbox_form.description" center clearable label="题目" placeholder="请输入题目说明，可以为空"/>
+        <van-field v-model="addCheckbox_form.description" center clearable label="题目说明" placeholder="请输入题目说明，可以为空"/>
          <van-row v-for="(option, index) in addCheckbox_form.options" v-bind:key="index">
            <van-field v-model="option.content" center clearable label="选项"  placeholder="请输入选项内容">
            <van-button slot="button" type="primary" icon="add-o" size="small"
@@ -95,6 +95,7 @@
 
 <script>
 import questionList from '@/components/questionnaire/questionList';
+import api from '../../api';
 import { Toast, Dialog } from 'vant';
 
 export default {
@@ -187,13 +188,41 @@ export default {
     },
     handleSave() {
       if (this.validNaire()) {
-        this.$router.push({
-          path: '/QuestionnaireView',
-          name: 'QuestionnaireView',
-          query: {
-            naire: this.naire,
+        //alert(JSON.stringify(this.naire));
+        api.SaveNaire(this.naire).then(
+          response => {
+            if (!response.ok) {
+              Toast.clear();
+              Dialog.alert({
+                title: '系统提示',
+                message: '问卷保存失败!请检查网络！',
+              }).then(() => {});
+            }
+            if (response.data.success) {
+              Toast.success('问卷保存成功');
+            } else {
+              Toast.clear();
+              Dialog.alert({
+                title: '系统提示',
+                message: '保存问卷失败!请检查数据！',
+              }).then(() => {});
+            }
           },
-        });
+          response => {
+            Toast.clear();
+            Dialog.alert({
+              title: '系统提示',
+              message: '保存问卷失败!请检查网络！',
+            }).then(() => {});
+          }
+        );
+        // this.$router.push({
+        //   path: '/QuestionnaireView',
+        //   name: 'QuestionnaireView',
+        //   query: {
+        //     naire: this.naire,
+        //   },
+        // });
       }
     },
     handlePublish() {
@@ -205,7 +234,7 @@ export default {
     addRadio() {
       this.addRadio_modal = true;
       const radioQues = {
-        question: '单选题目',
+        question: '',
         options: [],
         description: '',
         type: '单选',
@@ -227,7 +256,7 @@ export default {
     addCheckbox() {
       this.addCheckbox_modal = true;
       const checkboxQues = {
-        question: '多选题目',
+        question: '',
         options: [],
         description: '',
         type: '多选',
@@ -248,7 +277,7 @@ export default {
     addTextarea() {
       this.addTextarea_modal = true;
       const TextareaQues = {
-        question: '文本题目',
+        question: '',
         description: '',
         type: '文本',
         isRequired: true,

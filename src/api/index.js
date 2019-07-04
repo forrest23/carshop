@@ -1,5 +1,5 @@
 import { FileResource, UserResource, CarIdResource, MemberResource,
-  MemberBalanceResource, WtsResource } from './resources'
+  MemberBalanceResource, WtsResource, NaireResource } from './resources'
 
 export default {
   getCompanyInfo: function () {
@@ -31,5 +31,8 @@ export default {
   },
   SaveWts: function (data) {
     return WtsResource.save({id: 'SaveWts'}, data)
+  },
+  SaveNaire: function (data) {
+    return NaireResource.save({id: 'SaveNaire'}, data)
   }
 }

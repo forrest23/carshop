@@ -29,18 +29,15 @@
    
         <questionList :question-list="this.naire.topic">
           <van-row type="flex" justify="center" align="middle" class="code-row-bg">
-            <Button type="success"
+            <van-button type="success"
                     v-if="isAdmin"
                     @click="goBack">返回管理平台
-            </Button>
-            <Button type="primary"
+            </van-button>
+            <van-button type="primary"
                     @click="submitNaire" :disabled="finished">提交问卷
-            </Button>
+            </van-button>
           </van-row>
         </questionList>
-      </div>
-      <div class="footer">
-        <p>Timu蜗壳工作室</p>
       </div>
     </div>
   </div>
@@ -293,7 +290,6 @@
     max-height: 100%;
     height: 100%;
     width: 100%;
-    padding: 20px 10px;
     overflow-y: scroll;
   }
 

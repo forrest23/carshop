@@ -16,7 +16,7 @@
       <div class="question-options">
         <div v-if="topic.type === '单选'">
           <van-radio-group v-model="topic.selectContent" vertical style="width: 100%;">
-            <van-radio :label="option.o_id" v-for="(option, opIndex) in topic.options" :disabled="isPreview"
+            <van-radio :name="option.o_id" v-for="(option, opIndex) in topic.options" :disabled="isPreview"
                    class="option-item" :key="option.o_id">
               <span>{{option.content}}</span>
               <Input v-model="topic.additional"
