@@ -189,6 +189,8 @@ export default {
     handleSave() {
       if (this.validNaire()) {
         //alert(JSON.stringify(this.naire));
+        this.naire.workno = '';
+        this.naire.username = '';
         api.SaveNaire(this.naire).then(
           response => {
             if (!response.ok) {
@@ -199,7 +201,7 @@ export default {
               }).then(() => {});
             }
             if (response.data.success) {
-              Toast.success('问卷保存成功');
+              Toast.success('问卷保存成功' + response.data.naireId);
             } else {
               Toast.clear();
               Dialog.alert({
@@ -226,9 +228,16 @@ export default {
       }
     },
     handlePublish() {
-      if (this.validNaire()) {
-        this.saveNaire('发布失败，请重试');
-      }
+      this.$router.push({
+        path: '/QuestionnaireView',
+        name: 'QuestionnaireView',
+        query: {
+          n_id: 'C5172FFB-06E1-488D-82E6-9643D4D8F266111',
+        },
+      });
+      // if (this.validNaire()) {
+      //   this.saveNaire('发布失败，请重试');
+      // }
     },
     // 新建题目
     addRadio() {
@@ -334,45 +343,6 @@ export default {
     },
     closeTextareaModal() {
       this.addTextarea_modal = false;
-    },
-    // 当传入id值时，获取问卷详情，用于编辑
-    fetchData() {
-      if (this.$route.params.id) {
-        //        this.$store.dispatch('getNaire')
-        this.$store.dispatch('getQuestionList');
-        this.$store.dispatch('changeStatus', 'update');
-        // 通过 JSON 序列化将数组不再为引用，避免出现在 store 外修改 state 的内容
-      } else {
-        // 新增问卷
-        const _naire = {
-          title: '',
-          deadline: '',
-          intro: '',
-          status: 0,
-          topic: [],
-        };
-        let newNaire = Object.assign({}, _naire);
-        this.$store.dispatch('createNaire', newNaire);
-        this.$store.dispatch('changeStatus', 'create');
-      }
-    },
-    // 保存问卷和发布问卷
-    saveNaire(message) {
-      let _axios = this.$store.dispatch('saveNewNaire');
-      _axios
-        .then(response => {
-          console.log(response.data);
-          if (response.data.err === 0) {
-            this.$Message.success(response.data.data);
-            this.$router.push('/platform/list');
-          } else {
-            this.$Message.error(response.data.data);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-          this.$Message.error(message);
-        });
     },
     onDateSelect() {
       this.showDate = false;

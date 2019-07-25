@@ -37,7 +37,7 @@
               :label="option.o_id"
               v-for="(option, opIndex) in topic.options"
               :disabled="isPreview"
-              class="option-item" :key="option.o_id">
+              class="option-item" :key="option.o_id" :name="option.o_id">
               <span>{{option.content}}</span>
               <div class="option-action" v-show="isPreview" @click="delOption(index, opIndex)">
                 <van-icon type="close" size="16"></van-icon>
@@ -46,8 +46,7 @@
           </van-checkbox-group>
         </div>
         <div class="option-item" v-if="topic.type === '文本'">
-          <Input v-model="topic.selectContent" type="textarea" :autosize="{minRows: 2,maxRows: 5}"
-                 placeholder="请输入..." :disabled="isPreview"></Input>
+          <van-field v-model="topic.selectContent" type="textarea" placeholder="请输入..." :disabled="isPreview"/>
         </div>
       </div>
       </van-col>

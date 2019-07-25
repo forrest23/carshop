@@ -34,5 +34,8 @@ export default {
   },
   SaveNaire: function (data) {
     return NaireResource.save({id: 'SaveNaire'}, data)
+  },
+  GetNaire: function (params) {
+    return NaireResource.get(params)
   }
 }
