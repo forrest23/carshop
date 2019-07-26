@@ -95,64 +95,64 @@ export default {
   },
   watch: {
     //如果路由有变化，会再次执行该方法
-    $route: 'fetchData',
+    //$route: 'fetchData',
   },
   methods: {
-    handleSubmit(name) {
-      this.$refs[name].validate(valid => {
-        if (valid) {
-          // 查找用户，返回用户id
-          this.$http
-            .post('/user/getId', {
-              n_id: this.naire.n_id,
-              name: this.userInfo.name,
-              identity: this.userInfo.identity.toUpperCase(),
-            })
-            .then(response => {
-              console.log(response.data.data);
-              // 用户存在,服务器返回 u_id
-              if (response.data.err === 0 && !response.data.data.isFinished) {
-                this.isLogin = true;
-                console.log(response.data.data.u_id);
-                this.userId = response.data.data.u_id;
-                this.$Notice.open({
-                  title: '欢迎您 ' + response.data.data.name,
-                  desc: '请继续完成问卷内容吧！',
-                  duration: 5,
-                });
-              } else if (response.data.data.isFinished) {
-                this.$Notice.warning({
-                  title: '已完成问卷',
-                  desc: '您已完成该问卷，请勿重复提交！',
-                  duration: 5,
-                });
-                this.$router.push('/complete');
-              } else {
-                this.$Notice.warning({
-                  title: '用户不存在',
-                  desc: '请确认姓名和身份证号后重试！',
-                  duration: 5,
-                });
-              }
-            })
-            .catch(error => {
-              console.log(error);
-              this.$Message.error('用户登录失败，请重试');
-            });
-        } else {
-          this.$Message.error('请先填写用户信息!');
-        }
-      });
-    },
+    // handleSubmit(name) {
+    //   this.$refs[name].validate(valid => {
+    //     if (valid) {
+    //       // 查找用户，返回用户id
+    //       this.$http
+    //         .post('/user/getId', {
+    //           n_id: this.naire.n_id,
+    //           name: this.userInfo.name,
+    //           identity: this.userInfo.identity.toUpperCase(),
+    //         })
+    //         .then(response => {
+    //           console.log(response.data.data);
+    //           // 用户存在,服务器返回 u_id
+    //           if (response.data.err === 0 && !response.data.data.isFinished) {
+    //             this.isLogin = true;
+    //             console.log(response.data.data.u_id);
+    //             this.userId = response.data.data.u_id;
+    //             this.$Notice.open({
+    //               title: '欢迎您 ' + response.data.data.name,
+    //               desc: '请继续完成问卷内容吧！',
+    //               duration: 5,
+    //             });
+    //           } else if (response.data.data.isFinished) {
+    //             this.$Notice.warning({
+    //               title: '已完成问卷',
+    //               desc: '您已完成该问卷，请勿重复提交！',
+    //               duration: 5,
+    //             });
+    //             this.$router.push('/complete');
+    //           } else {
+    //             this.$Notice.warning({
+    //               title: '用户不存在',
+    //               desc: '请确认姓名和身份证号后重试！',
+    //               duration: 5,
+    //             });
+    //           }
+    //         })
+    //         .catch(error => {
+    //           console.log(error);
+    //           this.$Message.error('用户登录失败，请重试');
+    //         });
+    //     } else {
+    //       this.$Message.error('请先填写用户信息!');
+    //     }
+    //   });
+    // },
     fetchData() {
       const params = {
         id: 'GetNaire',
-        n_id: 'C5172FFB-06E1-488D-82E6-9643D4D8F266',
+        n_id: 'd9391ad6-5fba-4261-b681-f72fefb5642c',
       };
       api.GetNaire(params).then(
         response => {
           if (!response.ok) {
-            Toast('获取车辆维修历史失败!请检查网络！');
+            Toast('获取问卷信息失败!请检查网络！');
           }
           if (response.data.success) {
             this.naire = response.data.data;
@@ -161,7 +161,7 @@ export default {
           }
         },
         response => {
-          Toast('获取车辆维修历史失败!请检查网络!');
+          Toast('获取问卷信息失败!请检查网络!');
         }
       );
     },
@@ -233,27 +233,30 @@ export default {
         if (question.type === '单选') {
           const curQues = {
             n_id: nId,
-            u_id: this.userId,
+            type: question.type,
             q_id: question.q_id,
             o_id: question.selectContent,
+            o_ids:[],
             o_addition: question.additional.trim(),
           };
           result.push(curQues);
         } else if (question.type === '多选') {
           const curQues = {
             n_id: nId,
-            u_id: this.userId,
+            type: question.type,
             q_id: question.q_id,
-            o_id: question.selectMultipleContent,
+            o_id: '',
+            o_ids: question.selectMultipleContent,
             o_addition: question.additional.trim(),
           };
           result.push(curQues);
         } else {
           const curQues = {
             n_id: nId,
-            u_id: this.userId,
+            type: question.type,
             q_id: question.q_id,
             o_id: '',
+            o_ids:[],
             o_addition: question.selectContent.trim(),
           };
           result.push(curQues);
@@ -262,6 +265,26 @@ export default {
       console.log(result);
       // 防止重复提交
       this.finished = true;
+
+      var resultModel ={};
+      resultModel.name="";
+      resultModel.result=result;
+
+      api.FillNaire(resultModel).then(
+        response => {
+          if (!response.ok) {
+            Toast('问卷填写失败!请检查数据！');
+          }
+          if (response.data.success) {
+            Toast('问卷提交成功！');
+          } else {
+            Toast(response.data.message);
+          }
+        },
+        response => {
+          Toast('问卷填写失败!请检查网络!');
+        }
+      );
     },
   },
   computed: {

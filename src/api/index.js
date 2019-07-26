@@ -37,5 +37,8 @@ export default {
   },
   GetNaire: function (params) {
     return NaireResource.get(params)
+  },
+  FillNaire: function (data) {
+    return NaireResource.save({id: 'FillNaire'}, data)
   }
 }
