@@ -25,7 +25,10 @@
            <van-icon name="photograph" size="48px" color="#2894FF" @click="onRouterTo('定义问卷')"/>
            <span>定义问卷</span>
           </van-col>
-          <van-col span="6"/>
+          <van-col span="6">
+           <van-icon name="photograph" size="48px" color="#2894FF" @click="onRouterTo('报销上传')"/>
+           <span>报销上传</span>
+          </van-col>
           <van-col span="6"/>
           <van-col span="6"/>
        </van-row>
@@ -67,6 +70,9 @@ export default {
           break;
         case "定义问卷":
           this.$router.push('/QuestionnaireEdit');
+          break;
+        case "报销上传":
+          this.$router.push('/ClaimBack');
           break;
         default:
           break;

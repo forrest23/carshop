@@ -16,6 +16,7 @@ import RepairCarStatisticsDetail from '@/components/RepairCarStatisticsDetail'
 import QuestionnaireEdit from '@/components/questionnaire/edit'
 import QuestionnaireView from '@/components/questionnaire/view'
 import MemberScan from '@/components/MemberScan'
+import ClaimBack from '@/components/ClaimBack'
 
 import { Toast } from 'vant'
 
@@ -137,6 +138,13 @@ const router = new Router({
       path: '/questionnaireView',
       name: 'QuestionnaireView',
       component: QuestionnaireView,
+      meta: {
+        check: true
+      }
+    }, {
+      path: '/claimBack',
+      name: 'ClaimBack',
+      component: ClaimBack,
       meta: {
         check: true
       }

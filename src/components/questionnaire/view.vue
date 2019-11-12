@@ -59,7 +59,7 @@ export default {
         status: 0,
         topic: [],
       },
-      n_id: '',
+      n_id: this.$route.query.n_id,
       finished: false,
       spinShow: true,
       isLogin: false,
@@ -83,71 +83,16 @@ export default {
       },
     };
   },
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      vm.n_id = to.query.n_id;
-    });
-  },
-  filters: {
-    //   timeFormat (value) {
-    //     return formatDate(value)
-    //   }
-  },
-  watch: {
-    //如果路由有变化，会再次执行该方法
-    //$route: 'fetchData',
-  },
+  // beforeRouteEnter(to, from, next) {
+  //   next(vm => {
+  //     vm.n_id = to.query.n_id;
+  //   });
+  // },
   methods: {
-    // handleSubmit(name) {
-    //   this.$refs[name].validate(valid => {
-    //     if (valid) {
-    //       // 查找用户，返回用户id
-    //       this.$http
-    //         .post('/user/getId', {
-    //           n_id: this.naire.n_id,
-    //           name: this.userInfo.name,
-    //           identity: this.userInfo.identity.toUpperCase(),
-    //         })
-    //         .then(response => {
-    //           console.log(response.data.data);
-    //           // 用户存在,服务器返回 u_id
-    //           if (response.data.err === 0 && !response.data.data.isFinished) {
-    //             this.isLogin = true;
-    //             console.log(response.data.data.u_id);
-    //             this.userId = response.data.data.u_id;
-    //             this.$Notice.open({
-    //               title: '欢迎您 ' + response.data.data.name,
-    //               desc: '请继续完成问卷内容吧！',
-    //               duration: 5,
-    //             });
-    //           } else if (response.data.data.isFinished) {
-    //             this.$Notice.warning({
-    //               title: '已完成问卷',
-    //               desc: '您已完成该问卷，请勿重复提交！',
-    //               duration: 5,
-    //             });
-    //             this.$router.push('/complete');
-    //           } else {
-    //             this.$Notice.warning({
-    //               title: '用户不存在',
-    //               desc: '请确认姓名和身份证号后重试！',
-    //               duration: 5,
-    //             });
-    //           }
-    //         })
-    //         .catch(error => {
-    //           console.log(error);
-    //           this.$Message.error('用户登录失败，请重试');
-    //         });
-    //     } else {
-    //       this.$Message.error('请先填写用户信息!');
-    //     }
-    //   });
-    // },
     fetchData() {
       const params = {
         id: 'GetNaire',
-        n_id: 'd9391ad6-5fba-4261-b681-f72fefb5642c',
+        n_id: this.n_id,
       };
       api.GetNaire(params).then(
         response => {
@@ -298,7 +243,7 @@ export default {
       return false;
     },
   },
-  created() {
+  mounted() {
     this.fetchData();
   },
   components: {

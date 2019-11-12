@@ -109,6 +109,7 @@ export default {
         status: 0,
         topic: [],
       },
+      naireId:'',
       showDate: false,
       deadline: '',
       addRadio_modal: false,
@@ -201,7 +202,8 @@ export default {
               }).then(() => {});
             }
             if (response.data.success) {
-              Toast.success('问卷保存成功' + response.data.naireId);
+              this.naireId= response.data.data;
+              Toast.success('问卷保存成功');
             } else {
               Toast.clear();
               Dialog.alert({
@@ -232,7 +234,7 @@ export default {
         path: '/QuestionnaireView',
         name: 'QuestionnaireView',
         query: {
-          n_id: 'C5172FFB-06E1-488D-82E6-9643D4D8F266111',
+          n_id: this.naireId,
         },
       });
       // if (this.validNaire()) {
