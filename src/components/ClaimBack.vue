@@ -62,13 +62,37 @@ export default {
         })
         .catch(() => {});
     },
-    onClickRight() {
-         this.clearData();
-         Toast.success('数据提交成功');
+   onClickRight() {
+      Toast.loading({
+        mask: true,
+        message: '提交数据中...',
+      });
+      api.submit(this.claimBackModel).then(
+        response => {
+          if (!response.ok) {
+            Dialog.alert({
+              title: '系统提示',
+              message: '图片提交失败!请检查网络！',
+            }).then(() => {});
+          }
+          if (response.data.success) {
+            this.clearData();
+            Toast.success('图片提交成功');
+          } else {
+            Dialog.alert({
+              title: '系统提示',
+              message: '图片提交失败!请检查数据！',
+            }).then(() => {});
+          }
+        },
+        response => {
+          Dialog.alert({
+            title: '系统提示',
+            message: '图片提交失败!请检查网络！',
+          }).then(() => {});
+        }
+      );
     },
-    // onReadPhoto(file) {
-    //     this.uploadFile(file, 'claimback|face');
-    // },
     onReadPhotos(files) {
         if (Array.isArray(files)){
           for (let index in files) {
@@ -94,7 +118,7 @@ export default {
         success(result) {
           const formData = new FormData();
           formData.append(
-            type + '|' + that.claimBackModel.fcmpno + '|' + that.claimBackModel.fcmpno,
+            type + '|' + that.claimBackModel.fno + '|' + that.claimBackModel.fcmpno,
             result,
             imageFile.filename
           );
