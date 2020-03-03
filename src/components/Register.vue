@@ -37,7 +37,7 @@
 
     <van-button class="button" type="primary" size="large" @click="submit">提交绑定</van-button>
 
-    <van-panel title="绑定车主说明" desc="绑定后你会得到积分变动微信提醒" >
+    <van-panel title="" desc="公众号提交绑定后，需要您同时店内提交申请。绑定后您会收到会员充值兑换变动微信提醒，并支持微信支付验证码功能。" >
    </van-panel>
 </van-cell-group>
   </div>

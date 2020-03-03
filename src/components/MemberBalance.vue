@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import { Toast, Dialog } from 'vant';
-import api from '../api';
+import { Toast } from 'vant'
+import api from '../api'
 export default {
   name: 'Member',
-  data() {
+  data () {
     return {
       show: false,
       active: 0,
@@ -41,111 +41,111 @@ export default {
       balances: [],
       addHistorys: [],
       reduceHistorys: [],
-      actions: [],
-    };
+      actions: []
+    }
   },
-  mounted: function() {
-    this.getMember();
+  mounted: function () {
+    this.getMember()
   },
   methods: {
-      onClickLeft() {
-         this.$router.back(-1);
+    onClickLeft () {
+      this.$router.back(-1)
     },
-     onSelect(item) {
-      this.show = false;
+    onSelect (item) {
+      this.show = false
       this.member = this.memberlist.filter(
-          p => p.cardno === item.name
-      )[0];
-      this.cardno = this.member.cardno;
-      this.getBalance();
+        p => p.cardno === item.name
+      )[0]
+      this.cardno = this.member.cardno
+      this.getBalance()
     },
-     onCancel(item) {
+    onCancel (item) {
     },
-    showSelect(){
-      this.show = true;
+    showSelect () {
+      this.show = true
     },
-    getMember() {
+    getMember () {
       const params = {
         id: 'GetMemberByCardno',
         cmpno: this.cmpno,
-        cardno: this.cardno,
-      };
+        cardno: this.cardno
+      }
       api.getMember(params).then(
         response => {
           if (!response.ok) {
-            Toast('会员信息查询失败!请检查网络！');
+            Toast('会员信息查询失败!请检查网络！')
           }
           if (response.data.success) {
-            Toast.clear();
-            this.member = response.data.data;
-            this.getBalance();
+            Toast.clear()
+            this.member = response.data.data
+            this.getBalance()
           } else {
-           Toast('会员信息查询失败!请检查网络！');
+            Toast('会员信息查询失败!请检查网络！')
           }
         },
         response => {
-          Toast('会员信息查询失败!请稍后再试！');
+          Toast('会员信息查询失败!请稍后再试！')
         }
-      );
+      )
     },
 
-    getBalance() {
+    getBalance () {
       Toast.loading({
         mask: true,
-        message: '查询会员余额中...',
-      });
+        message: '查询会员余额中...'
+      })
       const params = {
         id: 'GetMemberBalance',
         cmpno: this.cmpno,
-        cardno: this.cardno,
-      };
+        cardno: this.cardno
+      }
       api.getMemberBalance(params).then(
         response => {
           if (!response.ok) {
-            Toast('查询会员余额失败!请检查网络！');
+            Toast('查询会员余额失败!请检查网络！')
           }
           if (response.data.success) {
-            Toast.clear();
-            this.balances = response.data.data;
+            Toast.clear()
+            this.balances = response.data.data
           } else {
-            Toast(response.data.message);
+            Toast(response.data.message)
           }
         },
         response => {
-          Toast('查询会员余额失败!请检查网络');
+          Toast('查询会员余额失败!请检查网络')
         }
-      );
+      )
     },
 
-    getHistory() {
+    getHistory () {
       const params = {
         id: 'GetMemberBalanceInOutHis',
         cmpno: this.cmpno,
-        cardno: this.cardno,
-      };
+        cardno: this.cardno
+      }
       api.getMemberBalance(params).then(
         response => {
           if (!response.ok) {
-            Toast('车主信息绑定失败!请检查网络！');
+            Toast('车主信息绑定失败!请检查网络！')
           }
           if (response.data.success) {
-            Toast.clear();
+            Toast.clear()
             this.addHistorys = response.data.data.filter(
               item => item.ftype === '储值'
-            );
+            )
             this.reduceHistorys = response.data.data.filter(
               item => item.ftype === '消费'
-            );
+            )
           } else {
-            Toast(response.data.message);
+            Toast(response.data.message)
           }
         },
         response => {
-          Toast('车主信息绑定失败!请检查网络');
+          Toast('车主信息绑定失败!请检查网络')
         }
-      );
+      )
     },
-    showDetail(itemno, itemname) {
+    showDetail (itemno, itemname) {
       this.$router.push({
         path: '/memberItem',
         name: 'MemberItem',
@@ -154,12 +154,12 @@ export default {
           cmpno: this.cmpno,
           cardno: this.cardno,
           itemno,
-          itemname,
-        },
-      });
-    },
-  },
-};
+          itemname
+        }
+      })
+    }
+  }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -168,4 +168,3 @@ export default {
   padding: 10px;
 }
 </style>
-

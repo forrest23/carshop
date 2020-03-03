@@ -17,6 +17,7 @@ import QuestionnaireEdit from '@/components/questionnaire/edit'
 import QuestionnaireView from '@/components/questionnaire/view'
 import MemberScan from '@/components/MemberScan'
 import ClaimBack from '@/components/ClaimBack'
+import Authorize from '@/components/Authorize'
 
 import { Toast } from 'vant'
 
@@ -147,6 +148,13 @@ const router = new Router({
       component: ClaimBack,
       meta: {
         check: true
+      }
+    }, {
+      path: '/authorize',
+      name: 'Authorize',
+      component: Authorize,
+      meta: {
+        check: false
       }
     }
   ]

@@ -1,5 +1,5 @@
 import { FileResource, UserResource, CarIdResource, MemberResource,
-  MemberBalanceResource, WtsResource, NaireResource } from './resources'
+  MemberBalanceResource, WtsResource, NaireResource, AuthorizeResource } from './resources'
 
 export default {
   getCompanyInfo: function () {
@@ -40,5 +40,14 @@ export default {
   },
   FillNaire: function (data) {
     return NaireResource.save({id: 'FillNaire'}, data)
+  },
+  InsertAuthorizeModel: function (data) {
+    return AuthorizeResource.save({id: 'InsertAuthorizeModel'}, data)
+  },
+  GetAuthorizeModel: function (params) {
+    return AuthorizeResource.get(params)
+  },
+  UpdateAuthorizeModel: function (params) {
+    return AuthorizeResource.get(params)
   }
 }
