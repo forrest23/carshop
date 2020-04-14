@@ -42,7 +42,7 @@
 
 <van-row class="rowtop">
   <van-col span="4"><van-switch v-model="checked" size="20px"/></van-col>
-  <van-col span="20" class="rowlabel">*本人同意将此表格的信息提供给丰田汽车（中国）投资有限公司，并同意此等信息可由丰田汽车（中国）投资有限公司向LEXUS雷克萨斯中国经销商、授权第三方（包括但不限于供应商、代理人等）共享。本人同意丰田汽车（中国）投资有限公司及其LEXUS雷克萨斯中国经销商向本人发送相关商业性信息。*丰田汽车（中国）投资有限公司保证按照<a href="https://cllexus.carcloud.xyz/lexus.pdf">《丰田汽车（中国）投资有限公司隐私政簧》</a>的规定及相关法律法规的规定，妥善使用消费者个人信息。</van-col>
+  <van-col span="20" class="rowlabel">*本人同意将此表格的信息提供给丰田汽车（中国）投资有限公司，并同意此等信息可由丰田汽车（中国）投资有限公司向LEXUS雷克萨斯中国经销商、授权第三方（包括但不限于供应商、代理人等）共享。本人同意丰田汽车（中国）投资有限公司及其LEXUS雷克萨斯中国经销商向本人发送相关商业性信息。*丰田汽车（中国）投资有限公司保证按照<a href="https://cllexus.carcloud.xyz/lexus.pdf">《丰田汽车（中国）投资有限公司隐私政策》</a>的规定及相关法律法规的规定，妥善使用消费者个人信息。</van-col>
 </van-row>
 </van-cell-group>
   </div>
